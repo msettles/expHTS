@@ -5,12 +5,10 @@
 #
 ##############################################################################
 
-import sys
-import os
-import argparse
-
 from expHTS_parser import parseArgs
 from preprocess_app import preprocessCMD
+
+from preprocess import *
 
 profile = False
 
