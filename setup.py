@@ -96,7 +96,7 @@ setup(
     entry_points={
         'console_scripts': [
             'expHTS=expHTS:main',
-            'preprocessHTS=preprocess:main',
+            'preprocessHTS=expHTS.preprocess:main',
         ],
     },
 )
