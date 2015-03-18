@@ -17,11 +17,11 @@
 
 # samples file should have at miniumum 2 columns [SAMPLE_ID, SEQUENCE_ID]
 # read in sample sheet and check for minimum required parameters
-# 
-#SAMPLE_ID SEQUENCE_ID
 #
-#LargeSeqLib   LargeSeqLib
-#SmallSeqLib   SmallSeqLib
+# SAMPLE_ID SEQUENCE_ID
+#
+# LargeSeqLib   LargeSeqLib
+# SmallSeqLib   SmallSeqLib
 
 import re
 import sys
@@ -33,6 +33,7 @@ class sampleSheet:
     """
     Class to read in and hold sample table information associated with Illumina sequence reads
     """
+
     def __init__(self, samplefile='samples.txt', sampleID='SAMPLE_ID', sequenceID='SEQUENCE_ID'):
         """
         Initialize a new sampleSheet object with the file sample list, parses and stores the sample information with
@@ -49,14 +50,14 @@ class sampleSheet:
             raise
         f = sfile.next()  # read first line of the file
         header = f.rstrip()
-        vheader = header.split('\t')
+        theader = header.split('\t')
         try:
-            sampleID_index = vheader.index(sampleID)
+            sampleID_index = theader.index(sampleID)
         except ValueError:
             sys.stderr.write('ERROR:[Sample sheet] Column %s was not found in the sample sheet\n' % sampleID)
             raise
         try:
-            sequenceID_index = vheader.index(sequenceID)
+            sequenceID_index = theader.index(sequenceID)
         except ValueError:
             sys.stderr.write('ERROR:[Sample sheet] Column %s was not found in the sample sheet\n' % sequenceID)
             raise
@@ -64,21 +65,32 @@ class sampleSheet:
             for row in sfile:
                 if row[0] == "#" or row[0] == "\n":  # comment or blank line
                     continue
-            row = row.rstrip()
-            row = row.split('\t')
-            if row[sampleID_index] == '':
-                raise
-            if row[sequenceID_index] == '':
-                raise
-            self.samples.append(row[sampleID_index])
-            self.sequences.append(row[sequenceID_index])
+                row = row.rstrip()
+                row = row.split('\t')
+                if row[sampleID_index] == '':
+                    raise
+                if row[sequenceID_index] == '':
+                    raise
+                self.samples.append(row[sampleID_index])
+                self.sequences.append(row[sequenceID_index])
+                self.sampleCount += 1
         except KeyboardInterrupt:
             sys.stderr.write('ERROR:[Sample sheet] Unexpectedly terminated')
 
     def getSampleCount(self):
         """
-        Get the number of samples read in from the sampleFile: assumes number lines - 1
+        Get the number of samples read in from the sampleFile
         """
-        with open('samples.txt', 'r') as f:
-            num_samps = sum(1 for _ in f) - 1
-        return num_samps
+        return repr(self.sampleCount)
+
+    def getRawReads(self, rawData="00-RawData"):
+        """
+        Given the sample names, find corresponding raw fastq reads in the 00-RawData folder
+        """
+        exist = os.path.isdir(rawData)
+        if exist is False:
+            sys.stderr.write('ERROR:[Sample sheet] %s folder not found' % rawData)
+            sys.exit()
+#        try:
+#            for samps in rawData:
+#                samps = len(os.listdir(rawData)) # compare length of sample ID index with sequences in file
