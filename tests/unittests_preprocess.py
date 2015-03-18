@@ -12,5 +12,11 @@ class preprocess_classes_tests(unittest.TestCase):
         self.assertFalse(expHTS.preprocess.preprocess_classes.version_check("1.1.0", "1.1"))
 
 
+class sampleSheet_classes_tests(unittest.TestCase):
+    def test_reading_sample_sheet(self):
+        ss = expHTS.samplesheet.sampleSheet('samples.txt')
+        self.assertTrue(ss.getSampleCount() is 4)       
+
+
 if __name__ == '__main__':
     unittest.main()
