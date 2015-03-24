@@ -27,7 +27,6 @@ class fastqIter:
     def close(self):
         self.inf.close()
 
-
 def writeFastq(handle, fq):
     handle.write(fq['id'] + '\n')
     handle.write(fq['seq'] + '\n')
