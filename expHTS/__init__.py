@@ -7,8 +7,9 @@
 
 from expHTS_parser import parseArgs
 from preprocess_app import preprocessCMD
-
+from samplesheet import sampleSheet
 from preprocess import *
+
 
 profile = False
 
