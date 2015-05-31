@@ -204,6 +204,4 @@ class sickle_processing(wrapper_base):
                 pass
         return sickle_output
 
-          analyzed <- as.numeric(sapply(strsplit(gsub(",|\\(|\\)","",analyzed),split=" "),"[[",6L))
-
 

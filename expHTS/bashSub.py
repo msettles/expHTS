@@ -7,20 +7,13 @@ import time
 import sys
 import signal
 import optparse
+import time
 
 flash_path = "/mnt/home/grcuser/module_grc/src/ETS_tmp/flash2" 
 sickle_path = "/mnt/home/grcuser/module_grc/src/ETS_tmp/sickle"
 super_deduper_path = "/mnt/home/grcuser/module_grc/src/ETS_tmp/super_deduper"
 screen_path = "/mnt/home/grcuser/module_grc/src/ETS_tmp"
 
-#get process group number to know what to kill
-pgid = os.getpgid(os.getpid())
-
-#the signal handler to kill the entire process group
-#incase Cntr + C is sent (sub processes aren't killed
-def signal_handler(signal, frame):
-	print "Cntr + c was hit - ending process group number " + str(pgid)
-	os.killpg(pgid, 9);
 
 #Basic Application class
 class bashSub:
@@ -37,6 +30,7 @@ class bashSub:
 		self.file_args = file_args
 		self.args = args
 		self.f_info = info_file
+		self.time = 0
 
 		if len(files) != len(file_args):
 			print >> sys.stderr, "Error: File args need to be the same length"
@@ -45,8 +39,11 @@ class bashSub:
 		
 		for i in range(0, len(files)):
 			self.cmd += " " + file_args[i] + " " + files[i] + " "
+		
+		self.cmd += " " + args
 
-		self.cmd += " " + args + " 2>" + self.f_info
+		if self.f_info != "":
+			self.cmd += " 2>" + self.f_info
 		
 	
 	def getCommand(self):
@@ -54,13 +51,20 @@ class bashSub:
 
 	def runCmd(self, additional_args):
 		try:
-			p2 = Popen(self.cmd + additional_args, stdout=PIPE, stdin=PIPE, stderr=sys.stderr, shell=True, executable = "/bin/bash");
-			p2.wait();
+			start = time.time()
+			p2 = Popen(self.cmd + additional_args, stdout=sys.stdout, stdin=PIPE, stderr=sys.stderr, shell=True, executable = "/bin/bash");
 			(output, error) = p2.communicate()
+			end = time.time()
+			self.time = end - start
+			print "Seconds: " + str(self.time)
 		except:
 			print "error"
 			print self.cmd + additional_args
 			print "Command failed"
+
+	def returnTime(self):
+		return self.time
+
 
 	def processSub(self):
 		return ["<(" + self.cmd + ")"]
@@ -132,4 +136,3 @@ def main():
 
 	print "Everything is finished up now"
 
-signal.signal(signal.SIGINT, signal_handler) 
