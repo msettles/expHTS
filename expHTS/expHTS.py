@@ -3,7 +3,6 @@ import sys
 import argparse
 from bashSub import bashSub
 from parse_files import parseOut, bringTogether
-from validate_app import validateApp
 import signal
 import os
 from distutils import spawn

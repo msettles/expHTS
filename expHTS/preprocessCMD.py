@@ -1,3 +1,10 @@
+from validate_app import validateApp
+import os
+from distutils import spawn
+import sys
+from parse_files import parseOut, bringTogether
+from bashSub import bashSub
+
 def checkPreprocessApplications():
         applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
 
