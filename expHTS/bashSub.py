@@ -54,6 +54,7 @@ class bashSub:
 			start = time.time()
 			p2 = Popen(self.cmd + additional_args, stdout=sys.stdout, stdin=PIPE, stderr=sys.stderr, shell=True, executable = "/bin/bash");
 			(output, error) = p2.communicate()
+			sys.stderr.flush();
 			end = time.time()
 			self.time = end - start
 			print "Seconds: " + str(self.time)

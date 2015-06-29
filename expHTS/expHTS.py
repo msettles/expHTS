@@ -2,10 +2,12 @@
 import sys
 import argparse
 from bashSub import bashSub
+from parse_files import parseOut, bringTogether
 from validate_app import validateApp
 import signal
 import os
 from distutils import spawn
+from preprocessCMD import preprocessCMD
 
 version_num = "0.0"
 """
@@ -45,7 +47,6 @@ def signal_handler(signal, frame):
         os.killpg(pgid, 9);
 
 
-
 def preprocessParser(subparser):
 	expHTS_parser = subparser.add_parser('preprocess', help='runs the baseline expHTS pipeline')
 	expHTS_parser.add_argument('-f', '--file', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt');
@@ -64,142 +65,6 @@ def preprocessParser(subparser):
 
 	return expHTS_parser
 
-
-def checkPreprocessApplications():
-	applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
-	
-	for app in applications:
-		if spawn.find_executable(app) is None:
-			sys.stderr.write("It doesn't look like you have app - " + app + "\n" )
-			exit(0)
-		else:
-			sys.stderr.write(app + " found\n")
-
-
-
-def setupContaminateScreen(args):
-	pass
-
-def setupSuperDeduper(args):
-	pass
-
-def setupSickle2(args):
-	pass
-
-def setupFlash(args):
-	pass
-
-def returnReads(dictSampleSeqFiles):
-	SE = ""
-	PE1 = ""
-	PE2 = ""
-
-	#data struct 
-	# { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
-	#diving into each of the sub lists in the dictionary value key
-	for e in dictSampleSeqFiles:
-		#if sublist only has one elment then it is SE read
-		if len(e) == 1:
-			if SE == "":
-				SE = e[0]
-			else:
-				SE += "," + e[0]
-
-		else:
-			if PE1 == "":
-				PE1 = e[0]
-				PE2 = e[1]
-			else:
-				PE1 += "," + e[0]
-				PE2 += "," + e[1]
-				
-
-	return [SE, PE1, PE2]
-
-
-def check_dir(Dir):
-
-	if not os.path.exists(Dir):
-		os.mkdir(Dir)
-		
-
-
-class preprocessCMD:
-	def __init__(self):
-    		self.metaDataFolder = "MetaData"
-
-    	def execute(self, args):
-        # ----------------------- options input files -----------------------
-		checkPreprocessApplications()
-		validate = validateApp()
-		validate.setValidation(True)
-		dictSampleSeqFiles = validate.validateSampleSheet(args.samplesDirectory, args.finalDir, args.samplesFile, args.force)
-		time = 0
-	
-		for key in dictSampleSeqFiles:
-			check_dir(args.finalDir)
-			check_dir(key[1])
-			meta =  key[1]
-
-			SEandPE = returnReads(dictSampleSeqFiles[key])
-
-			#screening python scripts created in virtual enviroment
-			extract_unmapped = "python " + os.path.join(os.path.dirname(os.path.realpath(__file__)), "extract_unmapped_reads.py")
-			screen = "python " + os.path.join(os.path.dirname(os.path.realpath(__file__)), "screen.py")
-			contArgsBaseline = " -t " + args.threads
-
-			if SEandPE[0] != "":
-				if args.contaminateFolder != "":
-					contArgsBaseline = "-c " + args.contaminateFolder + contArgsBaseline
-
-
-				mapper = bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null")
-				cFilter = bashSub(extract_unmapped, mapper.processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))
-				deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
-
-				sickleArgs = " -o " + os.path.join(key[1], "SE_not_merged.fastq")  +  " -t sanger -l " + args.minLength
-				if args.polyTrim:
-					sickleArgs += " -a "
-
-				scythe = bashSub("scythe",  [args.adapter], ["-a"], " --quite " + deduper.processSub()[0], os.path.join(meta, "SE_scythe_info.log"))
-				sickle =  bashSub("sickle se", scythe.processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log"))
-
-				print "___ SE COMMANDS ____"
-				print sickle.getCommand()
-				sickle.runCmd("")
-				time += sickle.returnTime()
-			if SEandPE[1] != "":
-				if args.contaminateFolder != "":
-					contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
-
-				mapper = bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null")
-				cFilter = bashSub(extract_unmapped, mapper.processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log"))
-				deduper = bashSub("super_deduper", cFilter.processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log"))
-
-				sickleArgs = " -M stdout -t sanger -l " + args.minLength
-				if args.polyTrim:
-					sickleArgs += " -a "
-		
-				sickle =  bashSub("sickle pe", deduper.processSub(), ['-c'], sickleArgs , os.path.join(meta, "PE_sickle_info.log"))
-
-				flash = bashSub("flash2", sickle.processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " 1>" + os.path.join(meta, "flash_info.log"), os.path.join(meta, "flash_info.log"))
-				print "___ PE COMMANDS ___"
-				print flash.getCommand()
-				flash.runCmd("")
-				time += flash.returnTime()
-
-
-		print "Total amount of seconds to run all samples"
-		print "Seconds: " + str(time)
-
-		self.clean()        
-
-	def clean(self):
-		import glob
-		for f in glob.glob(".screening_cont*"):
-			os.remove(f)
-
-		
 
 def parseArgs():
 	parser = argparse.ArgumentParser(description = "expHTS is a python application that is awesome", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)

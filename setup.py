@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages  # Always prefer setuptools over distutils
+from setuptools import setup, find_packages, Extension  # Always prefer setuptools over distutils
 from codecs import open  # To use a consistent encoding
 from os import path
 
@@ -8,9 +8,12 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+module1 = Extension('finalCleanup', sources=['lib/finalCleanup.c'])
+
 setup(
     name='expHTS',
-
+	
+    ext_modules = [module1],
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
@@ -23,8 +26,8 @@ setup(
     url='https://github.com/msettles/expHTS',
 
     # Author details
-    author='Matt Settles, Alida Gerritsen, Kristen Petersen, David Streett, Sam Hunter',
-    author_email='msettles@uidaho.edu',
+    author='David Streett, Alida Gerritsen, Kristen Petersen, Sam Hunter, Matt Settles',
+    author_email='streett.david@gmail.com, settles@ucdavis.edu',
 
     # Choose your license
     license='Apache',
@@ -93,6 +96,7 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
+
     entry_points={
         'console_scripts': [
             'expHTS=expHTS:main',
