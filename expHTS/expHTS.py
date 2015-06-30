@@ -49,6 +49,7 @@ def signal_handler(signal, frame):
 def preprocessParser(subparser):
 	expHTS_parser = subparser.add_parser('preprocess', help='runs the baseline expHTS pipeline')
 	expHTS_parser.add_argument('-f', '--file', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt');
+	expHTS_parser.add_argument('-S', '--forceSplit', help='Forces splits of SE reads [default FALSE]', action='store_true', dest='forceSplit', default=False);
 	expHTS_parser.add_argument('-t', '--threads', help='Threads for bowtie2 [default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20');
 	expHTS_parser.add_argument('-A', '--adapterfasta', help='folder name with adapter sequences in fasta format [default truseq adapter sequence]', action='store', type=str, default=r'<(printf ">TruSeq_forward_contam\nAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC[NNNNNN]ATCTCGTATGCCGTCTTCTGCTTGAAAAA\n>TruSeq_reverse_contam\nAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATTAAAAA")',  dest='adapter', metavar='CONTAMNANTS-FOLDER');
 	expHTS_parser.add_argument('-d', '--directory', help='Directory where the raw sequence data is stored [defualt 00-RawData]', action='store', type=str, dest='samplesDirectory', metavar='DIRECTORY', default='00-RawData');

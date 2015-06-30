@@ -121,7 +121,7 @@ class preprocessCMD:
           			if args.skipFlash == False:
 		                      terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
 
-                                terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''], "1 1 " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
+                                terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
 
 
 
