@@ -1,6 +1,10 @@
 import re
+import os
 
 def flashParser(f, h, d):
+	if not os.path.isfile(f):
+		return
+
 	f = open(f, "r")
 	strSearch = ["[FLASH]     Total pairs:", "[FLASH]     Discarded pairs:", "[FLASH]     Combined pairs:", "[FLASH]         Innie pairs:", "[FLASH]         Outie pairs:", "[FLASH]     Uncombined pairs:", "[FLASH]     Percent combined:"]
 
@@ -8,6 +12,9 @@ def flashParser(f, h, d):
 
 	data = []
 	lines = f.readlines()
+	if lines == []:
+		return;
+
 	index = 0
 	for e in lines:
 		if strSearch[index] in e:
@@ -25,6 +32,8 @@ def flashParser(f, h, d):
 	h += header
 	d += data
 def sickleParser(f, h, d):
+	if not os.path.isfile(f):
+		return
 
 	f = open(f, "r")
 	
@@ -39,6 +48,8 @@ def sickleParser(f, h, d):
 
 	lines = f.readlines()
 	index = 0
+	if lines == []:
+		return;
 	
 	for e in lines:
 		if strSearch[index] in e:
@@ -61,6 +72,8 @@ def sickleParser(f, h, d):
 
 
 def scythParser(f, h, d):
+	if not os.path.isfile(f):
+		return
 	f = open(f, "r")
 
 	strSearch = ["contaminated: "]
@@ -68,6 +81,8 @@ def scythParser(f, h, d):
 	data = []
 
 	lines = f.readlines()
+	if lines == []:
+		return;
 
 	index = 0;
 	
@@ -83,6 +98,8 @@ def scythParser(f, h, d):
 	d += data
 
 def filterParser(f, h, d):
+	if not os.path.isfile(f):
+		return
 	f = open(f, "r")
 		
 
@@ -91,9 +108,14 @@ def filterParser(f, h, d):
 	header = ["Screeing_PE_writtened", "Screening_SE_written", "Screening_discarded"]
 	data = []
 
-	lines = f.readlines()[-1].split("|")
+	lines = f.readlines()
 	index = 0
-
+	if lines == []:
+		return;
+	
+	lines = lines[-1]
+	lines = lines.split("|")
+	
 	for e in lines:
 		if strSearch[index] in e:
 			data.append(int(re.search(r'\d+', e).group()))
@@ -109,6 +131,8 @@ def filterParser(f, h, d):
 
 
 def deduperParser(f, h, d):
+	if not os.path.isfile(f):
+		return
 	f = open(f, "r")
 		
 
@@ -118,7 +142,10 @@ def deduperParser(f, h, d):
 	data = []
 
 	lines = f.readlines()
-	print lines
+
+	if lines == []:
+		return;
+
 	lines = lines[-1]
 	lines = lines.split("|")
 	index = 0

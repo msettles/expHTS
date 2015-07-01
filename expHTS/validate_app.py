@@ -66,7 +66,7 @@ class validateApp:
 			for subdir, dir, files in os.walk(directoryTest):
 				for file in files:
 					file = os.path.abspath(os.path.join(directoryTest, file))
-					if "_R1" in file and ".fastq.gz" in file:
+					if "_R1" in file and ".fastq" in file:
 						fastqCount += 1
 						if not sampleSeq in self.sampleFiles:
 							self.sampleFiles[sampleSeq] = []

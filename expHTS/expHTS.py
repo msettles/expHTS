@@ -46,7 +46,28 @@ def signal_handler(signal, frame):
         os.killpg(pgid, 9);
 
 
+def mappingParser(subparser):
+	mapping_parser = subparser.add_parser('mapping', help='runs the baseline expHTS pipeline')
+	mapping_parser.add_argument('-f', '--file', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt');
+	mapping_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [defualt 02-Cleaned]', action='store', type=str, dest='readFolder', metavar='FOLDER', default='02-Cleaned');
+	mapping_parser.add_argument('-M', "--mappingAlgorithm", help='Mapping algorithm bwa or bowtie2 [defualt bwa]', action='store', type=str, dest='mapping', metavar='algorithm', default='bwa');
+	mapping_parser.add_argument('-l', '--local', help='Quality score to use during lucy trimming [default 20]', action='store', type=str, dest='qualityTrim', metavar='QUALITY', default='20');
+	mapping_parser.add_argument('-m', '--miniumumLength', help='Discard reads less than minimum length [default 50]', action='store', type=str, dest='minLength', metavar='MINIUMUMLENGTH', default='50');
+	mapping_parser.add_argument('-o', '--overlap', help='Overlap parameter for flash [default 700]', action='store', type=str, dest='overlapFlash', metavar='OVERLAP', default='700');
+	mapping_parser.add_argument('-O', '--skip-overlap', help='do not perform the overlapping using flash [default FALSE]', action='store_true', dest='skipFlash',  default=False);
+	mapping_parser.add_argument('-s', '--skip-duplicates', help='do not preform the deduplication step [default FALSE]', action='store_true',  dest='skipDup',  default=False);
+	mapping_parser.add_argument('-c', '--contaminates-folder', help='folder name with contaminate sequences in fasta format [default NULL]', action='store', type=str, default='',  dest='contaminateFolder', metavar='CONTAMNANTS-FOLDER');
+	mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 02-Cleaned', action='store', type=str, default="02-Cleaned", dest="finalDir", metavar='DIRECTORY')
+	mapping_parser.add_argument('-a', '--polyA', help='perform polyA trimming in sickle [default FALSE]', action='store_true', dest='polyTrim', default=False);
+
+	return expHTS_parser
+
+
+
+
+
 def preprocessParser(subparser):
+
 	expHTS_parser = subparser.add_parser('preprocess', help='runs the baseline expHTS pipeline')
 	expHTS_parser.add_argument('-f', '--file', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt');
 	expHTS_parser.add_argument('-S', '--forceSplit', help='Forces splits of SE reads [default FALSE]', action='store_true', dest='forceSplit', default=False);

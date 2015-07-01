@@ -404,18 +404,14 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 	//PolyATTrim = tmpPolyATTrim;
 
         FILE *f = fopen(devFile, "r");
-        FILE *R1 = fopen(strR1, "w");
-        FILE *R2 = fopen(strR2, "w");
-        FILE *SE;
-	FILE *log = fopen(logFile, "w");
+        FILE *R1 = NULL;
+        FILE *R2 = NULL;
+        FILE *SE = NULL;
+	FILE *log = NULL;
 
         struct reads r;
         struct stats s;
         statsConstruct(&s);
-
-        if (forcePairs != 1) {
-                SE = fopen(strSE, "w");
-        }
 
         while (grabTab(f, &r, &s)) {
                 if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
@@ -424,14 +420,27 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			if (strlen((r.r1).r_qual) == 0) {
 				printf("2. im going to destory you\n");
 			}
-		
-                        fprintf(R1, "@N%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                        fprintf(R2, "@N%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			
+			if (R1 == NULL) {
+        			R1 = fopen(strR1, "w");
+			}		
+			if (R2 == NULL) {
+        			R2 = fopen(strR2, "w");
+			}
+			fprintf(R1, "@N%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+			fprintf(R2, "@N%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
                 } else if (forcePairs && (r.r1).r_header != NULL) {
                         s.numForcedPairs++;
                         int loc = (strlen((r.r1).r_seq))/2;
                         char cSeq = (r.r1).r_seq[loc];
                         char cQual = (r.r1).r_qual[loc];
+
+			if (R1 == NULL) {
+        			R1 = fopen(strR1, "w");
+			}		
+			if (R2 == NULL) {
+        			R2 = fopen(strR2, "w");
+			}
 
                         (r.r1).r_seq[loc] = '\0';
                         (r.r1).r_qual[loc] = '\0';
@@ -442,23 +451,39 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
                         fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
 			
                 } else if ((r.r2).r_header != NULL) {
+			if (SE == NULL) {
+                		SE = fopen(strSE, "w");
+			}
                         s.se_kept++;
                         fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
                 } else if ((r.r1).r_header != NULL) {
+			if (SE == NULL) {
+                		SE = fopen(strSE, "w");
+			}
                         s.se_kept++;
                         fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
                 }
 
         }
-	
+
+	if (log == NULL) {
+		log = fopen(logFile, "w");
+	}
+
         fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\n");
         fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs);
 
-        fclose(f);
-        fclose(R1);
-        fclose(R2);
+	if (f != NULL) {
+        	fclose(f);
+        }
 
-        if (forcePairs != 1) {
+	if (R1 != NULL) {
+		fclose(R1);
+        	fclose(R2);
+	}
+
+
+        if (SE != NULL) {
                 fclose(SE);
         }
 
