@@ -11,7 +11,7 @@ class validateApp:
 		self.verbose = True
 
 
-	def validateSampleSheet(self, dirSample, finalDir, sampleSheet, force):
+	def validateSampleSheet(self, dirSample, finalDir, sampleSheet, force, afterPreprocess):
 		linenum = 0
 		if not os.path.exists(dirSample):
 			self.exitTime("Directory " + dirSample + " is not found")
@@ -23,7 +23,10 @@ class validateApp:
 		
 		for e in f.readlines():
 			if linenum != 0:
-				self.sampleSequenceID(dirSample, finalDir, e.split("\t"), force)
+				if afterPreprocess:
+					self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force)
+				else:
+					self.sampleSequenceID(dirSample, finalDir, e.split("\t"), force)
 			linenum += 1
 
 		for key in self.sampleFiles:
@@ -31,18 +34,38 @@ class validateApp:
 
 		return self.sampleFiles
 
+
+
+
+        def sampleSequenceIDafterPreprocess(self, dirSample, finalDir, seqID, force):
+                if seqID[0][0] == "#":
+                        pass
+                elif len(seqID) >= 2:
+                        
+                        seqID[0] = os.path.join(dirSample, seqID[1])
+                        seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
+
+                        self.finalDirTest(seqID[1], force)
+                        self.directoryFiles(seqID)
+                else:
+                        self.exitTime("There wasn't two columns in the sample file file")
+
+
 	def sampleSequenceID(self, dirSample, finalDir, seqID, force):
 		if seqID[0][0] == "#":
 			pass
 		elif len(seqID) >= 2:
-
+			
 			seqID[0] = os.path.join(dirSample, seqID[0])
 			seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
 
+		
 			self.finalDirTest(seqID[1], force)
 			self.directoryFiles(seqID)
 		else:
-			self.exitTime("There wasn't two columns in the file")
+			self.exitTime("There wasn't two columns in the sample file file")
+
+
 
 	def finalDirTest(self, sampleID, force):
 		if os.path.exists(sampleID) and not force:
@@ -58,10 +81,9 @@ class validateApp:
 	def directoryFiles(self, sampleSeq):
 		sampleSeq = tuple(sampleSeq)
 		#print sampleSeq
-		directoryTest = sampleSeq[0]
+		directoryTest = sampleSeq[0].rstrip();
 		#fastqCount insures at least one fastq files is under the directory
 		fastqCount = 0
-
 		if self.testDirectory(directoryTest):
 			for subdir, dir, files in os.walk(directoryTest):
 				for file in files:
@@ -78,7 +100,7 @@ class validateApp:
 				self.exitTime("No fastq files were found under this directory - " + directoryTest)
 
 		else:
-			self.exitTime("Direcotry " + directoryTest + " does not exists")
+			self.exitTime("Directory " + directoryTest + " does not exists")
 			
 	def exitTime(self, exitString):
 		print exitString

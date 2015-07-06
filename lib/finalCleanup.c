@@ -230,6 +230,7 @@ void readStats(struct read r, struct stats *s) {
 
 }
 
+
 //Checks length first and then take length stats
 void getStats(struct reads *r, struct stats *s) {
 
@@ -404,6 +405,7 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 	//PolyATTrim = tmpPolyATTrim;
 
         FILE *f = fopen(devFile, "r");
+        //FILE *f = stderr;
         FILE *R1 = NULL;
         FILE *R2 = NULL;
         FILE *SE = NULL;
@@ -470,8 +472,9 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 		log = fopen(logFile, "w");
 	}
 
-        fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\n");
-        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs);
+        fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\n");
+        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
+		(float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
 
 	if (f != NULL) {
         	fclose(f);
