@@ -404,6 +404,7 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 	//PolyATTrim = tmpPolyATTrim;
 
         FILE *f = fopen(devFile, "r");
+        //FILE *f = stderr;
         FILE *R1 = NULL;
         FILE *R2 = NULL;
         FILE *SE = NULL;

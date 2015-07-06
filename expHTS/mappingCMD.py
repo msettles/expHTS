@@ -56,15 +56,15 @@ class mappingCMD:
 	def __init__(self):
 		self.metaDataFolder = "MetaData"
 
-	def createIndex(self, ref, algorithm):
+	def createIndex(self, ref, algorithm, forceIndex):
 		if os.path.exists(ref):
 			if "bowtie" in algorithm:
-				if not os.path.exists(os.path.join(ref, ".bt2")):
+				if not os.path.exists(os.path.join(ref, ".bt2") or forceIndex):
 					createTheIndex = bashSub("bowtie2-build ", [ref], [''], '', '/dev/null')
 					print createTheIndex.getCommand()
 					createTheIndex.runCmd("");
 			else:
-				if not os.path.exists(os.path.join(ref, ".sa")):
+				if not os.path.exists(os.path.join(ref, ".sa")) or forceIndex:
 					createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
 					print createTheIndex.getCommand()
 					createTheIndex.runCmd("");
@@ -73,11 +73,11 @@ class mappingCMD:
 			print "Doesn't seem ref - " + ref + "actually exists"
 		
 		
-	def index(self, ref, algorithm):
+	def index(self, ref, algorithm, forceIndex):
 		if ref == "":
 			print "Would you mind adding a reference file? (-R) Thank you."
 		else:
-			self.createIndex(ref, algorithm)
+			self.createIndex(ref, algorithm, forceIndex)
 			
 
 	def execute(self, args):
@@ -88,14 +88,14 @@ class mappingCMD:
 		dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
 		time = 0
 
-		self.index(args.refFasta, args.mapping)
+		self.index(args.refFasta, args.mapping, args.forceIndex)
 
 		for key in dictSampleSeqFiles:
 			check_dir(args.finalDir)
 			check_dir(key[1])
 			meta =  key[1]
 
-			endString = '| tee >(grep "^@" >headers.log) | tee >(samtools flagstat - >flagstats.log) | samtools view -bS - >' + os.path.join(key[1], "test.bam")
+			endString = ' 2>/dev/null | tee >(grep "^@" >headers.log) | tee >(samtools flagstat - >flagstats.log) | samtools view -bS - >' + os.path.join(key[1], "test.bam")
                         SEandPE = returnReads(dictSampleSeqFiles[key])
 
 			if SEandPE[0] != "":

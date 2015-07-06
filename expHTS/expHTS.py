@@ -55,6 +55,7 @@ def mappingParser(subparser):
         mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 03-Cleaned]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
         mapping_parser.add_argument('-a', '--polyA', help='perform polyA trimming in sickle [default FALSE]', action='store_true', dest='polyTrim', default=False)
 	mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+	mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default FALSE]', action='store_true', dest='forceIndex', default=False)
 
         return mapping_parser
 

@@ -164,15 +164,28 @@ def deduperParser(f, h, d):
 	h += header
 	d += data
 
+def finalParser(f, h, d):
+	if not os.path.isfile(f):
+		return
+	f = open(f, "r")
+		
+
+	lines = f.readlines()
+
+	print lines
+	if lines == []:
+		return;
+	
+	h += lines[0].split("\t")	
+	d += lines[1].split("\t")	
+
 
 def printToFile(out, header, data):
 	print out
 	f = open(out, "w")
 	
 	f.write('\t'.join(map(str,header)))
-	f.write('\n')
 	f.write('\t'.join(map(str,data)))
-	f.write('\n')
 
 	f.close()
 
@@ -190,11 +203,11 @@ def parseOut(base, sample):
 	deduperParser(os.path.join(base, "PE_deduper_info.log"), header, data)
 	sickleParser(os.path.join(base, "PE_sickle_info.log"), header, data)
 	flashParser(os.path.join(base, "flash_info.log"), header, data)
+	finalParser(os.path.join(base, "finalCleanup.log"), header, data)
 
+	printToFile(os.path.join(base, sample + "_SummaryStats.log"), header, data)	
 
-	printToFile(os.path.join(base, sample + "_stats.log"), header, data)	
-
-	return os.path.join(base, sample + "_stats.log")
+	return os.path.join(base, sample + "_SummaryStats.log")
 
 def bringTogether(listFiles, out):
 	first = 0
