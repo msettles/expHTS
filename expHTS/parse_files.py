@@ -172,7 +172,6 @@ def finalParser(f, h, d):
 
 	lines = f.readlines()
 
-	print lines
 	if lines == []:
 		return;
 	
@@ -181,7 +180,6 @@ def finalParser(f, h, d):
 
 
 def printToFile(out, header, data):
-	print out
 	f = open(out, "w")
 	
 	f.write('\t'.join(map(str,header)))
