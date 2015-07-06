@@ -132,7 +132,7 @@ class preprocessCMD:
                                 time += terminalString[-1].returnTime()
                                 logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
 
-                bringTogether(logFiles, os.path.join(key[1].split("/")[0], "SequenceSummaryStats.log"))
+                bringTogether(logFiles, os.path.join(key[1].split("/")[0], "Preprocessing_Summary.log"))
                 print "Total amount of seconds to run all samples"
                 print "Seconds: " + str(time)
 
