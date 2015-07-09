@@ -111,7 +111,7 @@ for line in insam:
         line2 = line.strip().split()
         flag = int(line2[1])
 
-        if (flag & 0x100 == 0):  # secondary alignment
+        if (flag & 0x100):  # secondary alignment
             continue
 
         i += 1
