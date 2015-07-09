@@ -12,8 +12,8 @@ module1 = Extension('finalCleanup', sources=['lib/finalCleanup.c'])
 
 setup(
     name='expHTS',
-	
-    ext_modules = [module1],
+
+    ext_modules=[module1],
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
