@@ -72,7 +72,7 @@ class validateApp:
 			self.exitTime(sampleID + " was all ready created. Use the -w or --overwrite option to overwrite")
 		elif os.path.exists(sampleID):
 			print "Warning"
-			print "Overwrite was turned on - overwriting " + sampleID + "\n\n"
+			print "Overwrite was turned on - overwriting " + sampleID + "\n"
 			
 			
 
