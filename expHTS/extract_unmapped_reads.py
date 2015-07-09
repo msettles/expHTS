@@ -178,24 +178,24 @@ for line in insam:
                     PE2[ID] = r2
                 continue
         # was mapped, count it up
-        if line2 != []:
-            contig = line2[2]
-        if contig in contig_map.keys():
-            if (flag & 0x1 == 0):  # SE
-                contig_map[contig]["SE"] += 1
-            elif (flag & 0x40):  # PE, Just count the first in the pair
-                contig_map[contig]["PE"] += 1
-        else:
-            contig_map[contig] = {}
-            if (flag & 0x1 == 0):  # SE
-                contig_map[contig]["SE"] = 1
-                contig_map[contig]["PE"] = 0
-            elif (flag & 0x40):  # PE, Just count the first in the pair
-                contig_map[contig]["SE"] = 0
-                contig_map[contig]["PE"] = 1
+        # if line2 != []:
+        #     contig = line2[2]
+        #     if contig in contig_map.keys():
+        #         if (flag & 0x1 == 0):  # SE
+        #             contig_map[contig]["SE"] += 1
+        #         elif (flag & 0x40):  # PE, Just count the first in the pair
+        #             contig_map[contig]["PE"] += 1
+        #     else:
+        #         contig_map[contig] = {}
+        #         if (flag & 0x1 == 0):  # SE
+        #             contig_map[contig]["SE"] = 1
+        #             contig_map[contig]["PE"] = 0
+        #         elif (flag & 0x40):  # PE, Just count the first in the pair
+        #             contig_map[contig]["SE"] = 0
+        #             contig_map[contig]["PE"] = 1
 
-for k in contig_map.keys():
-    print >> sys.stderr,  "\tFound %s: percent: %.2f, PE mapped: %s, SE mapped: %s" % (k, (2*PE_written+SE_written)/i, contig_map[k]["PE"], contig_map[k]["SE"])
+# for k in contig_map.keys():
+#     print >> sys.stderr,  "\tFound %s: percent: %.2f, PE mapped: %s, SE mapped: %s" % (k, (2*PE_written+SE_written)/i, contig_map[k]["PE"], contig_map[k]["SE"])
 
 print >> sys.stderr, "Records processed: %s | PE_written: %s | SE_written: %s | Discarded: %s " % (i, PE_written, SE_written, i-(PE_written*2+SE_written))
 
