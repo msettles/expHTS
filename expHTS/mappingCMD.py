@@ -71,11 +71,13 @@ class mappingCMD:
 
 		else:
 			print "Doesn't seem ref - " + ref + "actually exists"
-		
+			exit(1);
+
 		
 	def index(self, ref, algorithm, forceIndex):
 		if ref == "":
 			print "Would you mind adding a reference file? (-R) Thank you."
+			exit(1);
 		else:
 			self.createIndex(ref, algorithm, forceIndex)
 			
@@ -95,8 +97,9 @@ class mappingCMD:
 			check_dir(key[1])
 			meta =  key[1]
 
-			endString = ' 2>/dev/null | tee >(grep "^@" >headers.log) | tee >(samtools flagstat - >flagstats.log) | samtools view -bS - >' + os.path.join(key[1], "test.bam")
+			endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], key[1].split("/")[-1] + "headers.log") +  ') | tee >(samtools flagstat - >' + os.path.join(key[1], key[1].split("/")[-1] + 'flagstats.log') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], key[1].split("/")[-1])
                         SEandPE = returnReads(dictSampleSeqFiles[key])
+
 
 			if SEandPE[0] != "":
 				terminalString = []
@@ -104,14 +107,17 @@ class mappingCMD:
 				terminalString = []
 
 				terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
-				
+				runIndex = bashSub("samtools index ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '', '/dev/null')
+						
 				print "___ PE COMMANDS ___"
 				print terminalString[-1].getCommand()
 				terminalString[-1].runCmd("")
+				runIndex.runCmd("")
+				print runIndex.getCommand()
 				sys.stderr.flush()
 				time += terminalString[-1].returnTime()
-				logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
-
+				#logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
+				
 	                #bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
        	        	print "Total amount of seconds to run all samples"
                 	print "Seconds: " + str(time)

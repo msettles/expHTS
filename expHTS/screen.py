@@ -50,13 +50,14 @@ class screening:
 
 		source.runCmd("")
 		load.runCmd("")
-
-		if not os.path.exists(fastaFile):
+		
+		
+		if not os.path.exists(fastaFile + ".4.bt2"):
 			combine.runCmd("")
 			build.runCmd("")
 
-		cmd = bowtie.runCmd("")
-	
+		bowtie.runCmd("")
+		print bowtie.getCommand();
 
 
 	

@@ -8,6 +8,7 @@ import os
 from distutils import spawn
 from preprocessCMD import preprocessCMD
 from mappingCMD import mappingCMD
+from htseqcountCMD import htseqCMD
 
 version_num = "0.0"
 """
@@ -44,6 +45,25 @@ def signal_handler(signal, frame):
         os.killpg(pgid, 9);
 
 
+
+def htseqParser(subparser):
+
+        htseq_parser = subparser.add_parser('htseq', help='Runs htseq-count on mapped files')
+        htseq_parser.add_argument('-f', '--file', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt');
+        htseq_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [defualt 03-BWA]', action='store', type=str, dest='readFolder', metavar='FOLDER', default='03-BWA');
+        htseq_parser.add_argument('-R', "--referenceGTF", help='Reference gtf to count against', action='store', type=str, dest='refGTF', metavar='REFERENCE GFT', default='');
+        htseq_parser.add_argument('-o', "--order", help='pos or name - [default name]', action='store', type=str, dest='order', metavar='ORDER', default='name');
+        htseq_parser.add_argument('-s', "--stranded", help='yes, no, or reverse - [default yes]', action='store', type=str, dest='stranded', metavar='STRANDED', default='yes');
+        htseq_parser.add_argument('-m', "--mode", help='union, intersection-strict, intersection-nonempty - [default union]', action='store', type=str, dest='mode', metavar='MODE', default='union');
+        htseq_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 04-HTS-Counts]', action='store', type=str, default="04-HTS-Counts", dest="finalDir", metavar='DIRECTORY')
+	htseq_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+
+
+
+        return htseq_parser
+
+
+
 def mappingParser(subparser):
 
         mapping_parser = subparser.add_parser('mapping', help='runs the baseline expHTS pipeline')
@@ -53,7 +73,6 @@ def mappingParser(subparser):
         mapping_parser.add_argument('-M', "--mappingAlgorithm", help='Mapping algorithm bwa or bowtie2 [defualt bwa]', action='store', type=str, dest='mapping', metavar='ALGORITHM', default='bwa');
         mapping_parser.add_argument('-t', '--threads', help='Number of threads to be used [Default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20');
         mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 03-Cleaned]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
-        mapping_parser.add_argument('-a', '--polyA', help='perform polyA trimming in sickle [default FALSE]', action='store_true', dest='polyTrim', default=False)
 	mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
 	mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default FALSE]', action='store_true', dest='forceIndex', default=False)
 
@@ -87,6 +106,7 @@ def parseArgs():
         subparsers = parser.add_subparsers(help='commands', dest='command')
         preprocessParser(subparsers)
         mappingParser(subparsers)
+	htseqParser(subparsers)
         args = parser.parse_args()
         return args
 
@@ -95,8 +115,9 @@ def main():
         subparsers = parser.add_subparsers(help='commands', dest='command')
         preprocess= preprocessCMD()
         mapping = mappingCMD()
-	print "Here"
-        commands = {'preprocess': preprocess, 'mapping': mapping}
+	htseq = htseqcountCMD()
+
+        commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq}
         args = parseArgs()
         print args.command
         commands[args.command].execute(args)

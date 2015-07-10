@@ -401,8 +401,6 @@ char *reverse(char *read) {
 
 int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, int tmpforcePairs, int tmpPolyATTrim) {
         int forcePairs = tmpforcePairs;
-	//PolyATTrim = tmpPolyATTrim;
-	//PolyATTrim = tmpPolyATTrim;
 
         FILE *f = fopen(devFile, "r");
         //FILE *f = stderr;
@@ -414,6 +412,7 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         struct reads r;
         struct stats s;
         statsConstruct(&s);
+	PolyATTrim = tmpPolyATTrim;
 
         while (grabTab(f, &r, &s)) {
                 if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
@@ -429,9 +428,17 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			if (R2 == NULL) {
         			R2 = fopen(strR2, "w");
 			}
-			fprintf(R1, "@N%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-			fprintf(R2, "@N%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-                } else if (forcePairs && (r.r1).r_header != NULL) {
+
+			if ((r.r1).r_header[0] == '@') {
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                	} else {
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			}
+
+
+		} else if (forcePairs && (r.r1).r_header != NULL) {
                         s.numForcedPairs++;
                         int loc = (strlen((r.r1).r_seq))/2;
                         char cSeq = (r.r1).r_seq[loc];
@@ -444,27 +451,44 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         			R2 = fopen(strR2, "w");
 			}
 
-                        (r.r1).r_seq[loc] = '\0';
-                        (r.r1).r_qual[loc] = '\0';
-                        fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                        (r.r1).r_seq[loc] = cSeq;
-                        (r.r1).r_qual[loc] = cQual;
-
-                        fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
-			
+			if ((r.r1).r_header == '@') {
+				(r.r1).r_seq[loc] = '\0';
+				(r.r1).r_qual[loc] = '\0';
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				(r.r1).r_seq[loc] = cSeq;
+				(r.r1).r_qual[loc] = cQual;
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+			} else {
+				(r.r1).r_seq[loc] = '\0';
+				(r.r1).r_qual[loc] = '\0';
+				fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				(r.r1).r_seq[loc] = cSeq;
+				(r.r1).r_qual[loc] = cQual;
+				fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+			}			
                 } else if ((r.r2).r_header != NULL) {
 			if (SE == NULL) {
                 		SE = fopen(strSE, "w");
 			}
                         s.se_kept++;
-                        fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+
+			if ((r.r2).r_header == '@') {
+                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                        } else {
+				fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			}
+
                 } else if ((r.r1).r_header != NULL) {
 			if (SE == NULL) {
                 		SE = fopen(strSE, "w");
 			}
                         s.se_kept++;
-                        fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                }
+			if ((r.r1).r_header == '@') {
+                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                	} else {
+                        	fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+			}
+		}
 
         }
 
