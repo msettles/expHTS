@@ -64,7 +64,7 @@ class mappingCMD:
 					print createTheIndex.getCommand()
 					createTheIndex.runCmd("");
 			else:
-				if not os.path.exists(os.path.join(ref, ".sa")) or forceIndex:
+				if not os.path.exists(ref + ".sa") or forceIndex:
 					createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
 					print createTheIndex.getCommand()
 					createTheIndex.runCmd("");
