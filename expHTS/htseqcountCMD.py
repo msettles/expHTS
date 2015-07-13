@@ -78,12 +78,12 @@ class htseqCMD:
 			outFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".out"
 			countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
             
-			runSortByName = bashSub("samtools sort ", [bamFile], [''], os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+			runSortByName = bashSub("samtools sort -n ", [bamFile], [''], os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
 
             		print runSortByName.getCommand()
             		runSortByName.runCmd("")
 
-			cmdString = "htseq-count -f bam -r " + args.order + " -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid") + " " + args.refGTF + " 2>" + outFile + " >" + countFile
+			cmdString = "htseq-count -f bam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid") + " " + args.refGTF + " 2>" + outFile + " >" + countFile
 
 			htseqCmd = bashSub(cmdString, [''], [''], '', '')
 			print htseqCmd.getCommand()
