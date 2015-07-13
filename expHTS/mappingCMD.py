@@ -51,6 +51,7 @@ def check_dir(Dir):
 
 
 class mappingCMD:
+
     def __init__(self):
         self.metaDataFolder = "MetaData"
 
@@ -105,6 +106,7 @@ class mappingCMD:
                 runIndex = bashSub("samtools index ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '', '/dev/null')
                 runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '> ' + os.path.join(key[1], key[1].split("/")[-1] + ".idxstats"), '/dev/null')
                 runSortByName = bashSub("samtools sort ", [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], os.path.join(key[1], key[1].split("/")[-1] + ".byreadid"), '/dev/null')
+
                 print "___ PE COMMANDS ___"
                 print terminalString[-1].getCommand()
                 terminalString[-1].runCmd("")
