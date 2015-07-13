@@ -89,12 +89,14 @@ class mappingCMD:
 
         self.index(args.refFasta, args.mapping, args.forceIndex)
 
+        fileEnding = key[1].split("/")[-1]
+
         for key in dictSampleSeqFiles:
             check_dir(args.finalDir)
             check_dir(key[1])
             meta = key[1]  # NOT USED SO FAR
 
-            endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], key[1].split("/")[-1] + ".header") + ') | tee >(samtools flagstat - >' + os.path.join(key[1], key[1].split("/")[-1] + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], key[1].split("/")[-1])
+            endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], fileEnding + ".header") + ') | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding)
             SEandPE = returnReads(dictSampleSeqFiles[key])
 
             if SEandPE[0] != "":
@@ -103,9 +105,9 @@ class mappingCMD:
                 terminalString = []
 
                 terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
-                runIndex = bashSub("samtools index ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '', '/dev/null')
-                runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '> ' + os.path.join(key[1], key[1].split("/")[-1] + ".idxstats"), '/dev/null')
-                runSortByName = bashSub("samtools sort ", [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], os.path.join(key[1], key[1].split("/")[-1] + ".byreadid"), '/dev/null')
+                runIndex = bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
+                runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
+                runSortByName = bashSub("samtools sort ", [os.path.join(key[1], fileEnding + ".bam")], [''], os.path.join(key[1], fileEnding + ".byreadid"), '/dev/null')
 
                 print "___ PE COMMANDS ___"
                 print terminalString[-1].getCommand()

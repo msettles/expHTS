@@ -205,6 +205,20 @@ def parseOut(base, sample):
     return os.path.join(base, sample + "_SummaryStats.log")
 
 
+
+def parseOutMapping(base, sample):
+    import os
+    data = []
+    header = []
+    
+    header.append("Sample")
+    
+    indexParser(os.path.join(base, ""), header, data)
+    
+
+
+
+
 def bringTogether(listFiles, out):
     first = 0
     outFile = open(out, "w")
