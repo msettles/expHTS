@@ -5,129 +5,129 @@ import sys
 from parse_files import parseOut, bringTogether
 from bashSub import bashSub
 
+
 def checkPreprocessApplications():
-	applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
+    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
 
-	for app in applications:
-		if spawn.find_executable(app) is None:
-			sys.stderr.write("It doesn't look like you have app - " + app + "\n" )
-			exit(0)
-		else:
-			sys.stderr.write(app + " found\n")
-
+    for app in applications:
+        if spawn.find_executable(app) is None:
+            sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            exit(0)
+        else:
+            sys.stderr.write(app + " found\n")
 
 
 def returnReads(dictSampleSeqFiles):
-	SE = ""
-	PE1 = ""
-	PE2 = ""
+    SE = ""
+    PE1 = ""
+    PE2 = ""
 
-#data struct 
-# { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
-#diving into each of the sub lists in the dictionary value key
-	for e in dictSampleSeqFiles:
-		#if sublist only has one elment then it is SE read
-		if len(e) == 1:
-			if SE == "":
-				SE = e[0]
-			else:
-				SE += "," + e[0]
+    # data struct
+    # { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
+    # diving into each of the sub lists in the dictionary value key
+    for e in dictSampleSeqFiles:
+        # if sublist only has one elment then it is SE read
+        if len(e) == 1:
+            if SE == "":
+                SE = e[0]
+            else:
+                SE += "," + e[0]
 
-		else:
-			if PE1 == "":
-				PE1 = e[0]
-				PE2 = e[1]
-			else:
-				PE1 += "," + e[0]
-				PE2 += "," + e[1]
+        else:
+            if PE1 == "":
+                PE1 = e[0]
+                PE2 = e[1]
+            else:
+                PE1 += "," + e[0]
+                PE2 += "," + e[1]
 
-
-	return [SE, PE1, PE2]
+    return [SE, PE1, PE2]
 
 
 def check_dir(Dir):
 
-	if not os.path.exists(Dir):
-		os.mkdir(Dir)
-
+    if not os.path.exists(Dir):
+        os.mkdir(Dir)
 
 
 class mappingCMD:
-	def __init__(self):
-		self.metaDataFolder = "MetaData"
 
-	def createIndex(self, ref, algorithm, forceIndex):
-		if os.path.exists(ref):
-			if "bowtie" in algorithm:
-				if not os.path.exists(os.path.join(ref, ".bt2") or forceIndex):
-					createTheIndex = bashSub("bowtie2-build ", [ref], [''], '', '/dev/null')
-					print createTheIndex.getCommand()
-					createTheIndex.runCmd("");
-			else:
-				if not os.path.exists(ref + ".sa") or forceIndex:
-					createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
-					print createTheIndex.getCommand()
-					createTheIndex.runCmd("");
+    def __init__(self):
+        self.metaDataFolder = "MetaData"
 
-		else:
-			print "Doesn't seem ref - " + ref + "actually exists"
-			exit(1);
+    def createIndex(self, ref, algorithm, forceIndex):
+        if os.path.exists(ref):
+            if "bowtie" in algorithm:
+                if not os.path.exists(os.path.join(ref, ".bt2") or forceIndex):
+                    createTheIndex = bashSub("bowtie2-build ", [ref], [''], '', '/dev/null')
+                    print createTheIndex.getCommand()
+                    createTheIndex.runCmd("")
+            else:
+                if not os.path.exists(os.path.join(ref, ".sa")) or forceIndex:
+                    createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
+                    print createTheIndex.getCommand()
+                    createTheIndex.runCmd("")
 
-		
-	def index(self, ref, algorithm, forceIndex):
-		if ref == "":
-			print "Would you mind adding a reference file? (-R) Thank you."
-			exit(1);
-		else:
-			self.createIndex(ref, algorithm, forceIndex)
-			
+        else:
+            print "Doesn't seem ref - " + ref + "actually exists"
+            exit(1)
 
-	def execute(self, args):
-		logFiles = []
-		checkPreprocessApplications()
-		validate = validateApp()
-		validate.setValidation(True)
-		dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
-		time = 0
+    def index(self, ref, algorithm, forceIndex):
+        if ref == "":
+            print "Would you mind adding a reference file? (-R) Thank you."
+            exit(1)
+        else:
+            self.createIndex(ref, algorithm, forceIndex)
 
-		self.index(args.refFasta, args.mapping, args.forceIndex)
+    def execute(self, args):
+        logFiles = []  # NOT USED SO FAR
+        checkPreprocessApplications()
+        validate = validateApp()
+        validate.setValidation(True)
+        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
+        time = 0
 
-		for key in dictSampleSeqFiles:
-			check_dir(args.finalDir)
-			check_dir(key[1])
-			meta =  key[1]
+        self.index(args.refFasta, args.mapping, args.forceIndex)
 
-			endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], key[1].split("/")[-1] + "headers.log") +  ') | tee >(samtools flagstat - >' + os.path.join(key[1], key[1].split("/")[-1] + 'flagstats.log') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], key[1].split("/")[-1])
-                        SEandPE = returnReads(dictSampleSeqFiles[key])
+        for key in dictSampleSeqFiles:
+            check_dir(args.finalDir)
+            check_dir(key[1])
+            meta = key[1]  # NOT USED SO FAR
 
+            endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], key[1].split("/")[-1] + ".header") + ') | tee >(samtools flagstat - >' + os.path.join(key[1], key[1].split("/")[-1] + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], key[1].split("/")[-1])
+            SEandPE = returnReads(dictSampleSeqFiles[key])
 
-			if SEandPE[0] != "":
-				terminalString = []
-			if SEandPE[1] != "":
-				terminalString = []
+            if SEandPE[0] != "":
+                terminalString = []
+            if SEandPE[1] != "":
+                terminalString = []
 
-				terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
-				runIndex = bashSub("samtools index ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '', '/dev/null')
-						
-				print "___ PE COMMANDS ___"
-				print terminalString[-1].getCommand()
-				terminalString[-1].runCmd("")
-				runIndex.runCmd("")
-				print runIndex.getCommand()
-				sys.stderr.flush()
-				time += terminalString[-1].returnTime()
-				#logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
-				
-	                #bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
-       	        	print "Total amount of seconds to run all samples"
-                	print "Seconds: " + str(time)
+                terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
+                runIndex = bashSub("samtools index ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '', '/dev/null')
+                runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], '> ' + os.path.join(key[1], key[1].split("/")[-1] + ".idxstats"), '/dev/null')
+                runSortByName = bashSub("samtools sort ", [os.path.join(key[1], key[1].split('/')[-1] + ".bam")], [''], os.path.join(key[1], key[1].split("/")[-1] + ".byreadid"), '/dev/null')
 
-                	self.clean()
+                print "___ PE COMMANDS ___"
+                print terminalString[-1].getCommand()
+                terminalString[-1].runCmd("")
+                print runIndex.getCommand()
+                runIndex.runCmd("")
+                print runIdxStats.getCommand()
+                runIdxStats.runCmd("")
+                if args.sortByReadID:
+                    print runSortByName.getCommand()
+                    runSortByName.runCmd("")
 
+                sys.stderr.flush()
+                time += terminalString[-1].returnTime()
+            # logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
+            # bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
+            print "Total amount of seconds to run all samples"
+            print "Seconds: " + str(time)
+
+            self.clean()
 
         def clean(self):
                 import glob
                 for f in glob.glob(".screening_cont*"):
                         os.remove(f)
-
-
