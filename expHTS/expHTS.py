@@ -50,7 +50,7 @@ def htseqParser(subparser):
     # htseq_parser.add_argument('-o', "--order", help='pos or name - [default name]', action='store', type=str, dest='order', metavar='ORDER', default='name');
     htseq_parser.add_argument('-s', "--stranded", help='yes, no, or reverse - [default yes]', action='store', type=str, dest='stranded', metavar='STRANDED', default='yes')
     htseq_parser.add_argument('-m', "--mode", help='union, intersection-strict, intersection-nonempty - [default union]', action='store', type=str, dest='mode', metavar='MODE', default='union')
-    htseq_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 04-HTS-Counts]', action='store', type=str, default="04-HTS-Counts", dest="finalDir", metavar='DIRECTORY')
+    htseq_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 04-HTseqCounts]', action='store', type=str, default="04-HTseqCounts", dest="finalDir", metavar='DIRECTORY')
     htseq_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
 
     return htseq_parser
@@ -61,11 +61,13 @@ def mappingParser(subparser):
     mapping_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
     mapping_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [defualt 02-Cleaned]', action='store', type=str, dest='readFolder', metavar='FOLDER', default='02-Cleaned')
     mapping_parser.add_argument('-R', "--reference", help='Reference fasta to map against', action='store', type=str, dest='refFasta', metavar='REFERENCE', default='')
-    mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default FALSE]', action='store_true', dest='forceIndex', default=False)
+    mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default False]', action='store_true', dest='forceIndex', default=False)
     mapping_parser.add_argument('-M', "--mappingAlgorithm", help='Mapping algorithm bwa or bowtie2 [defualt bwa]', action='store', type=str, dest='mapping', metavar='ALGORITHM', default='bwa')
-    mapping_parser.add_argument('-t', '--threads', help='Number of threads to be used [Default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')
+    mapping_parser.add_argument('-n', "--sortByReadID", help-"When sorting bam files, sort by read ID (samtools -n option), for compatability with htseq-count [default False]", action='store_true', dest='sortByReadID', default=False)
+    # mapping_parser.add_atrument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatability with htseq-count [default %default]", action='store_true', dest="ignoreSingles", default=False)
     mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 03-BWA]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
     mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    mapping_parser.add_argument('-t', '--threads', help='Number of threads to be used [Default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')
 
     return mapping_parser
 
@@ -83,9 +85,9 @@ def preprocessParser(subparser):
     expHTS_parser.add_argument('-s', '--skip-duplicates', help='do not preform the deduplication step [default FALSE]', action='store_true',  dest='skipDup',  default=False)
     expHTS_parser.add_argument('-c', '--contaminates-folder', help='folder name with contaminate sequences in fasta format [default NULL]', action='store', type=str, default='',  dest='contaminateFolder', metavar='CONTAMNANTS-FOLDER')
     expHTS_parser.add_argument('-a', '--polyA', help='perform polyA trimming in sickle [default FALSE]', action='store_true', dest='polyTrim', default=False)
-    expHTS_parser.add_argument('-t', '--threads', help='Threads for bowtie2 [default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')
     expHTS_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 02-Cleaned', action='store', type=str, default="02-Cleaned", dest="finalDir", metavar='DIRECTORY')
     expHTS_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    expHTS_parser.add_argument('-t', '--threads', help='Threads for bowtie2 [default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')
 
     return expHTS_parser
 
