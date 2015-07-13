@@ -2,7 +2,7 @@ from validate_app import validateApp
 import os
 from distutils import spawn
 import sys
-from parse_files import parseOut, bringTogether
+from parse_files import parseOutMapping, bringTogether
 from bashSub import bashSub
 
 
@@ -86,16 +86,16 @@ class mappingCMD:
         validate.setValidation(True)
         dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
         time = 0
-
+        logFiles = []
         self.index(args.refFasta, args.mapping, args.forceIndex)
 
-        fileEnding = key[1].split("/")[-1]
 
         for key in dictSampleSeqFiles:
             check_dir(args.finalDir)
             check_dir(key[1])
             meta = key[1]  # NOT USED SO FAR
 
+            fileEnding = key[1].split("/")[-1]
             endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], fileEnding + ".header") + ') | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding)
             SEandPE = returnReads(dictSampleSeqFiles[key])
 
@@ -107,7 +107,7 @@ class mappingCMD:
                 terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
                 runIndex = bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
                 runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
-                runSortByName = bashSub("samtools sort ", [os.path.join(key[1], fileEnding + ".bam")], [''], os.path.join(key[1], fileEnding + ".byreadid"), '/dev/null')
+                #runSortByName = bashSub("samtools sort ", [os.path.join(key[1], fileEnding + ".bam")], [''], os.path.join(key[1], fileEnding + ".byreadid"), '/dev/null')
 
                 print "___ PE COMMANDS ___"
                 print terminalString[-1].getCommand()
@@ -116,20 +116,20 @@ class mappingCMD:
                 runIndex.runCmd("")
                 print runIdxStats.getCommand()
                 runIdxStats.runCmd("")
-                if args.sortByReadID:
-                    print runSortByName.getCommand()
-                    runSortByName.runCmd("")
+                #if args.sortByReadID:
+                #    print runSortByName.getCommand()
+                #    runSortByName.runCmd("")
 
                 sys.stderr.flush()
                 time += terminalString[-1].returnTime()
+                
+                logFiles.append(parseOutMapping(key[1], key[1].split("/")[-1]))
+
+            print logFiles
+            bringTogether(logFiles, os.path.join(args.finalDir, "Mapping_Summary.log"))
+
             # logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
             # bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
             print "Total amount of seconds to run all samples"
             print "Seconds: " + str(time)
 
-            self.clean()
-
-        def clean(self):
-                import glob
-                for f in glob.glob(".screening_cont*"):
-                        os.remove(f)

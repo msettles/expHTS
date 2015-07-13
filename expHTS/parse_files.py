@@ -177,6 +177,28 @@ def finalParser(f, h, d):
     d += data
 
 
+def flagstatsParse(f, h, d):
+    if not os.path.isfile(f):
+        return;
+    f = open(f, "r")
+    lines = f.readlines()
+    if lines == []:
+        return;
+
+    header = ["Total", "Secondary", "Supplementary", "Duplicates", "Mapped", "Mapped_Percent", "Paired","Read1", "Read2", "Properly_Paired", "Properly_Paired_Percent", "With_itself_and_Mate_mapped", "Singletons", "Singletons_Percent", "With_Mate_Mapped_To_A_Different_chr", "With_Mate_mapped_to_a_different_chr_Mapq>=5" ]
+    data = []
+    
+    for e in lines:  # for each element in line
+                data.append(float(re.findall("\d+", e)[0]))
+                tmp = re.findall("\d+.\d+%", e)
+                if tmp != []:
+                    data.append(tmp[0])
+
+    h += header
+    d += data
+
+    print data
+
 def printToFile(out, header, data):
     f = open(out, "w")
 
@@ -212,10 +234,12 @@ def parseOutMapping(base, sample):
     header = []
     
     header.append("Sample")
-    
-    indexParser(os.path.join(base, ""), header, data)
-    
+    data.append(sample)
 
+    flagstatsParse(os.path.join(base, sample + ".flagstats"), header, data)
+    printToFile(os.path.join(base, sample + "_SummaryStats.log"), header, data)
+	
+    return os.path.join(base, sample + "_SummaryStats.log")
 
 
 
