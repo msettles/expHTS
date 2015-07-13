@@ -58,12 +58,12 @@ class mappingCMD:
     def createIndex(self, ref, algorithm, forceIndex):
         if os.path.exists(ref):
             if "bowtie" in algorithm:
-                if not os.path.exists(os.path.join(ref, ".bt2") or forceIndex):
+                if not os.path.exists(ref + ".bt2") or forceIndex):
                     createTheIndex = bashSub("bowtie2-build ", [ref], [''], '', '/dev/null')
                     print createTheIndex.getCommand()
                     createTheIndex.runCmd("")
             else:
-                if not os.path.exists(os.path.join(ref, ".sa")) or forceIndex:
+                if not os.path.exists(ref +".sa") or forceIndex:
                     createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
                     print createTheIndex.getCommand()
                     createTheIndex.runCmd("")
