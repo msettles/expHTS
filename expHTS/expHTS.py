@@ -49,6 +49,9 @@ def htseqParser(subparser):
     htseq_parser.add_argument('-R', "--referenceGTF", help='Reference gtf to count against', action='store', type=str, dest='refGTF', metavar='REFERENCE GFT', default='')
     # htseq_parser.add_argument('-o', "--order", help='pos or name - [default name]', action='store', type=str, dest='order', metavar='ORDER', default='name');
     htseq_parser.add_argument('-s', "--stranded", help='yes, no, or reverse - [default yes]', action='store', type=str, dest='stranded', metavar='STRANDED', default='yes')
+    htseq_parser.add_argument('-a', "--minaqual", help='skip all reads with alignment quality lower than the given minimum value [default 10]', action='store', type=str, dest='minQual', metavar='MINAQUAL', default='10')
+    htseq_parser.add_argument('-y', "--type", help='feature type (3rd column in GFF file) to be used, all features of other type are ignored [default suitable for ensembly GTF files: exons]', action='store', type=str, dest='type', metavar='TYPE', default='exon')
+    htseq_parser.add_argument('-i', "--idattr", help='GFF attribute to be used as feature ID [default: gene_id]"', action='store', type=str, dest='idattr', metavar='IDATTR', default='gene_id')
     htseq_parser.add_argument('-m', "--mode", help='union, intersection-strict, intersection-nonempty - [default union]', action='store', type=str, dest='mode', metavar='MODE', default='union')
     htseq_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 04-HTseqCounts]', action='store', type=str, default="04-HTseqCounts", dest="finalDir", metavar='DIRECTORY')
     htseq_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
@@ -64,7 +67,7 @@ def mappingParser(subparser):
     mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default False]', action='store_true', dest='forceIndex', default=False)
     mapping_parser.add_argument('-M', "--mappingAlgorithm", help='Mapping algorithm bwa or bowtie2 [defualt bwa]', action='store', type=str, dest='mapping', metavar='ALGORITHM', default='bwa')
     #mapping_parser.add_argument('-n', "--sortByReadID", help="When sorting bam files, sort by read ID (samtools -n option), for compatability with htseq-count [default False]", action='store_true', dest='sortByReadID', default=False)
-    mapping_parser.add_argument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatability with htseq-count [default %default]", action='store_true', dest="ignoreSingles", default=False)
+    mapping_parser.add_argument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatability with htseq-count [default %(default)s]", action='store_true', dest="ignoreSingles", default=False)
     mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 03-BWA]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
     mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
     mapping_parser.add_argument('-t', '--threads', help='Number of threads to be used [Default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')

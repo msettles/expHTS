@@ -227,7 +227,6 @@ def parseOut(base, sample):
     return os.path.join(base, sample + "_SummaryStats.log")
 
 
-
 def parseOutMapping(base, sample):
     import os
     data = []
@@ -237,9 +236,10 @@ def parseOutMapping(base, sample):
     data.append(sample)
 
     flagstatsParse(os.path.join(base, sample + ".flagstats"), header, data)
-    printToFile(os.path.join(base, sample + "_SummaryStats.log"), header, data)
-	
-    return os.path.join(base, sample + "_SummaryStats.log")
+    
+    printToFile(os.path.join(base, sample + "_MappingSummaryStats.log"), header, data)
+
+    return os.path.join(base, sample + "_MappingSummaryStats.log")
 
 
 
@@ -252,9 +252,16 @@ def bringTogether(listFiles, out):
         lines = f.readlines()
         if first == 0:
             outFile.write(lines[0])
+            if lines[0][-1] == '\n':
+                outFile.write('\n')
+
             outFile.write(lines[1])
+            if lines[1][-1] == '\n':
+                outFile.write('\n')
         else:
             outFile.write(lines[1])
+            if lines[1][-1] == '\n':
+                outFile.write('\n')
         first += 1
         f.close()
 

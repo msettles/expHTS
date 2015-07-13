@@ -83,7 +83,7 @@ class htseqCMD:
             		print runSortByName.getCommand()
             		runSortByName.runCmd("")
 
-			cmdString = "htseq-count -f bam -r " + args.order + " -s " + args.stranded + " -a 10 -t exon -i gene_id -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid") + " " + args.refGTF + " 2>" + outFile + " >" + countFile
+			cmdString = "htseq-count -f bam -r " + args.order + " -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid") + " " + args.refGTF + " 2>" + outFile + " >" + countFile
 
 			htseqCmd = bashSub(cmdString, [''], [''], '', '')
 			print htseqCmd.getCommand()
