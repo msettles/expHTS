@@ -83,7 +83,7 @@ class htseqCMD:
             		print runSortByName.getCommand()
             		runSortByName.runCmd("")
 
-			cmdString = "htseq-count -f bam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam") + " " + args.refGTF + " 2>" + outFile + " >" + countFile
+			cmdString = "htseq-count -f bam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + "<( samtools view -F 0x100 -bh " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam") + ") " + args.refGTF + " 2>" + outFile + " >" + countFile
 
 			htseqCmd = bashSub(cmdString, [''], [''], '', '')
 			print htseqCmd.getCommand()
