@@ -58,11 +58,12 @@ class preprocessCMD:
 
         def execute(self, args):
                 logFiles = []
+                time = 0
+
                 checkPreprocessApplications()
                 validate = validateApp()
                 validate.setValidation(True)
                 dictSampleSeqFiles = validate.validateSampleSheet(args.samplesDirectory, args.finalDir, args.samplesFile, args.force, False)
-                time = 0
 
                 for key in dictSampleSeqFiles:
                         check_dir(args.finalDir)

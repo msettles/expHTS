@@ -84,13 +84,14 @@ class mappingCMD:
             self.createIndex(ref, algorithm, forceIndex)
 
     def execute(self, args):
-        logFiles = []  # NOT USED SO FAR
-        checkPreprocessApplications()
+        time = 0
+        logFiles = []
+
+        # checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
         dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
-        time = 0
-        logFiles = []
+
         self.index(args.refFasta, args.mapping, args.forceIndex)
 
         for key in dictSampleSeqFiles:

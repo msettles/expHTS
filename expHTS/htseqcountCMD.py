@@ -60,14 +60,16 @@ class htseqCMD:
             exit(1)
 
     def execute(self, args):
-        time =  0 # not being used
+        time =  0
+        logFiles = []
 
-        logFiles = []  # not used
-        checkPreprocessApplications()
+        # checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
-        self.index(args.refGTF)
         dictSampleSeqFiles = validate.validateSampleSheetHTSeq(args.readFolder, args.finalDir, args.samplesFile, args.force)
+
+        self.index(args.refGTF)
+
         for keys in dictSampleSeqFiles.keys():
             check_dir(args.finalDir)
             check_dir(keys[1])
@@ -76,11 +78,11 @@ class htseqCMD:
             outFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".out"
             countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
 
-            runSortByName = bashSub("samtools view -bF 0x100", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
-            print runSortByName.getCommand()
+            # runSortByName = bashSub("samtools view -bF 0x100", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+            runSortByName = bashSub("samtools sort -n", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')            print runSortByName.getCommand()
             runSortByName.runCmd("")
 
-            runView = bashSub("samtools view ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam")], [''], "> " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam"), '/dev/null')
+            runView = bashSub("samtools view -F 0x100 ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam")], [''], "> " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam"), '/dev/null')
             print runView.getCommand()
             runView.runCmd("")
 
@@ -100,6 +102,8 @@ class htseqCMD:
 
         print "Total amount of seconds to run all samples"
         print "Seconds: " + str(time)
+
+        self.clean()
 
         def clean(self):
             pass
