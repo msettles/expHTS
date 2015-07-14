@@ -252,12 +252,12 @@ void getStats(struct reads *r, struct stats *s) {
 
         if ((r->r1).r_header != NULL) {
                 readStats(r->r1, s);
-                ((s->R1_length)[(r->r1).r_len])++;
+               // ((s->R1_length)[(r->r1).r_len])++;
 	    }
 
         if ((r->r2).r_header != NULL) {
                 readStats(r->r2, s);
-                ((s->R2_length)[(r->r2).r_len])++;
+               // ((s->R2_length)[(r->r2).r_len])++;
 	    }
 
 
@@ -506,10 +506,11 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         SE_len += (s.SE_length[sum] * sum);
     }
 
-
-        fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\tR1_Len\tR2_Len\n");
+        fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\n");
         fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
-		(float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)), (float)R1_len/((float)s.pe_kept/2.0), (float)R2_len/((float)s.pe_kept/2.0));
+        //fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\tR1_Len\tR2_Len\n");
+        //fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
+		(float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
 
 	if (f != NULL) {
         	fclose(f);
@@ -525,6 +526,9 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
                 fclose(SE);
         }
 
+        if (log != NULL) {
+            fclose(log);
+        }
 }
    
 

@@ -296,15 +296,15 @@ def bringTogether(listFiles, out):
         lines = f.readlines()
         if first == 0:
             outFile.write(lines[0])
-            if lines[0][-1] == '\n':
+            if lines[0][-1] != '\n':
                 outFile.write('\n')
 
             outFile.write(lines[1])
-            if lines[1][-1] == '\n':
+            if lines[1][-1] != '\n':
                 outFile.write('\n')
         else:
             outFile.write(lines[1])
-            if lines[1][-1] == '\n':
+            if lines[1][-1] != '\n':
                 outFile.write('\n')
         first += 1
         f.close()
