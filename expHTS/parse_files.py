@@ -226,7 +226,14 @@ def printToFile(out, header, data):
     f = open(out, "w")
 
     f.write('\t'.join(map(str, header)))
+    
+    if '\t'.join(map(str, header))[-1] != '\n':
+        f.write('\n')
+
     f.write('\t'.join(map(str, data)))
+
+    if '\t'.join(map(str, data))[-1] != '\n':
+        f.write('\n')
 
     f.close()
 

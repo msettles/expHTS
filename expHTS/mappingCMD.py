@@ -132,7 +132,3 @@ class mappingCMD:
         print "Total amount of seconds to run all samples"
         print "Seconds: " + str(time)
 
-        self.clean()
-
-        def clean(self):
-            pass

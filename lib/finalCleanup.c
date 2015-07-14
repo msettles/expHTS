@@ -252,12 +252,12 @@ void getStats(struct reads *r, struct stats *s) {
 
         if ((r->r1).r_header != NULL) {
                 readStats(r->r1, s);
-                (s->R1_length)[(r->r1).r_len];
+                ((s->R1_length)[(r->r1).r_len])++;
 	    }
 
         if ((r->r2).r_header != NULL) {
                 readStats(r->r2, s);
-                (s->R2_length)[(r->r2).r_len];
+                ((s->R2_length)[(r->r2).r_len])++;
 	    }
 
 
@@ -501,9 +501,9 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 	}
 
     for (sum = 0; sum < 700; sum++) {
-        R1_len += s.R1_length[sum];
-        R2_len += s.R2_length[sum];
-        SE_len += s.SE_length[sum];
+        R1_len += (s.R1_length[sum] * sum);
+        R2_len += (s.R2_length[sum] * sum);
+        SE_len += (s.SE_length[sum] * sum);
     }
 
 
