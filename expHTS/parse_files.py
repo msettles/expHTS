@@ -136,7 +136,7 @@ def deduperParser(f, h, d):
 
     strSearch = ["reads:", "duplicates:", "percent:", "discarded:"]
 
-    header = ["Deduper_discarded", "Deduper_reads", "Deduper_duplicates", "Deduper_Percent_Duplicate"]
+    header = ["Deduper_reads", "Deduper_duplicates", "Deduper_Percent_Duplicate", "Deduper_discarded"]
     data = []
 
     lines = f.readlines()  # read in each line

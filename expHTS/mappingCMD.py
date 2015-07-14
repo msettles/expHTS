@@ -63,7 +63,7 @@ class mappingCMD:
                     print createTheIndex.getCommand()
                     createTheIndex.runCmd("")
             else:
-                if not os.path.exists(ref +".sa") or forceIndex:
+                if not os.path.exists(ref + ".sa") or forceIndex:
                     createTheIndex = bashSub("bwa index ", [ref], [''], '', '/dev/null')
                     print createTheIndex.getCommand()
                     createTheIndex.runCmd("")
@@ -89,7 +89,6 @@ class mappingCMD:
         logFiles = []
         self.index(args.refFasta, args.mapping, args.forceIndex)
 
-
         for key in dictSampleSeqFiles:
             check_dir(args.finalDir)
             check_dir(key[1])
@@ -102,12 +101,13 @@ class mappingCMD:
             if SEandPE[0] != "":
                 terminalString = []
             if SEandPE[1] != "":
+                RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
+
                 terminalString = []
 
-                terminalString.append(bashSub("bwa mem", [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + " -M " + endString, "/dev/null"))
+                terminalString.append(bashSub("bwa mem -M " + RGstring, [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + endString, "/dev/null"))
                 runIndex = bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
                 runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
-                #runSortByName = bashSub("samtools sort ", [os.path.join(key[1], fileEnding + ".bam")], [''], os.path.join(key[1], fileEnding + ".byreadid"), '/dev/null')
 
                 print "___ PE COMMANDS ___"
                 print terminalString[-1].getCommand()
@@ -116,20 +116,14 @@ class mappingCMD:
                 runIndex.runCmd("")
                 print runIdxStats.getCommand()
                 runIdxStats.runCmd("")
-                #if args.sortByReadID:
-                #    print runSortByName.getCommand()
-                #    runSortByName.runCmd("")
 
                 sys.stderr.flush()
                 time += terminalString[-1].returnTime()
-                
+
                 logFiles.append(parseOutMapping(key[1], key[1].split("/")[-1]))
 
             print logFiles
             bringTogether(logFiles, os.path.join(args.finalDir, "Mapping_Summary.log"))
 
-            # logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
-            # bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
             print "Total amount of seconds to run all samples"
             print "Seconds: " + str(time)
-
