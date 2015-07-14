@@ -5,6 +5,10 @@ import sys
 from parse_files import parseOutMapping, bringTogether
 from bashSub import bashSub
 
+'''
+TODO: figure out why htseq isn't accepting the bam file, we have to first convert to sam
+'''
+
 
 def checkPreprocessApplications():
     applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
@@ -127,7 +131,7 @@ class mappingCMD:
         print "Total amount of seconds to run all samples"
         print "Seconds: " + str(time)
 
-            self.clean()
+        self.clean()
 
         def clean(self):
             pass
