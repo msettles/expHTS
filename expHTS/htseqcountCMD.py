@@ -5,96 +5,93 @@ import sys
 from parse_files import parseOut, bringTogether
 from bashSub import bashSub
 
+
 def checkPreprocessApplications():
-	applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
+    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
 
-	for app in applications:
-		if spawn.find_executable(app) is None:
-			sys.stderr.write("It doesn't look like you have app - " + app + "\n" )
-			exit(0)
-		else:
-			sys.stderr.write(app + " found\n")
-
+    for app in applications:
+        if spawn.find_executable(app) is None:
+            sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            exit(0)
+        else:
+            sys.stderr.write(app + " found\n")
 
 
 def returnReads(dictSampleSeqFiles):
-	SE = ""
-	PE1 = ""
-	PE2 = ""
+    SE = ""
+    PE1 = ""
+    PE2 = ""
 
-#data struct 
-# { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
-#diving into each of the sub lists in the dictionary value key
-	for e in dictSampleSeqFiles:
-		#if sublist only has one elment then it is SE read
-		if len(e) == 1:
-			if SE == "":
-				SE = e[0]
-			else:
-				SE += "," + e[0]
+    # data struct
+    # { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
+    # diving into each of the sub lists in the dictionary value key
+    for e in dictSampleSeqFiles:
+        # if sublist only has one elment then it is SE read
+        if len(e) == 1:
+            if SE == "":
+                SE = e[0]
+            else:
+                SE += "," + e[0]
 
-		else:
-			if PE1 == "":
-				PE1 = e[0]
-				PE2 = e[1]
-			else:
-				PE1 += "," + e[0]
-				PE2 += "," + e[1]
+        else:
+            if PE1 == "":
+                PE1 = e[0]
+                PE2 = e[1]
+            else:
+                PE1 += "," + e[0]
+                PE2 += "," + e[1]
 
-
-	return [SE, PE1, PE2]
+    return [SE, PE1, PE2]
 
 
 def check_dir(Dir):
 
-	if not os.path.exists(Dir):
-		os.mkdir(Dir)
-
+    if not os.path.exists(Dir):
+        os.mkdir(Dir)
 
 
 class htseqCMD:
-	def __init__(self):
-		self.metaDataFolder = "MetaData"
+    def __init__(self):
+        self.metaDataFolder = "MetaData"
 
-		
-	def index(self, ref):
-		if not os.path.exists(ref):
-			print "Would you mind adding a gtf file? (-R) Thank you."
-			exit(1);
+    def index(self, ref):
+        if not os.path.exists(ref):
+            print "Would you mind adding a gtf file? (-R) Thank you."
+            exit(1)
 
+    def execute(self, args):
+        logFiles = [] # not used
+        checkPreprocessApplications()
+        validate = validateApp()
+        validate.setValidation(True)
+        self.index(args.refGTF)
+        dictSampleSeqFiles = validate.validateSampleSheetHTSeq(args.readFolder, args.finalDir, args.samplesFile, args.force)
+        for keys in dictSampleSeqFiles.keys():
+            check_dir(args.finalDir)
+            check_dir(keys[1])
 
-	def execute(self, args):
-		logFiles = []
-		checkPreprocessApplications()
-		validate = validateApp()
-		validate.setValidation(True)
-		self.index(args.refGTF)
-		dictSampleSeqFiles = validate.validateSampleSheetHTSeq(args.readFolder, args.finalDir, args.samplesFile, args.force)
-		for keys in dictSampleSeqFiles.keys():
-			check_dir(args.finalDir)
-			check_dir(keys[1])
+            bamFile = os.path.join(keys[0], keys[0].split("/")[-1]) + ".bam"
+            outFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".out"
+            countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
 
-			bamFile = os.path.join(keys[0], keys[0].split("/")[-1]) + ".bam"
-			outFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".out"
-			countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
-            
-			runSortByName = bashSub("samtools sort -n ", [bamFile], [''], os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+            runSortByName = bashSub("samtools view -bF 0x100", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+            print runSortByName.getCommand()
+            runSortByName.runCmd("")
 
-            		print runSortByName.getCommand()
-            		runSortByName.runCmd("")
+            runView = bashSub("samtools view ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam")], [''], "> " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam") , '/dev/null')
+            print runView.getCommand()
+            runView.runCmd("")
 
-			cmdString = "htseq-count -f bam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + "<( samtools view -F 0x100 -bh " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam") + ") " + args.refGTF + " 2>" + outFile + " >" + countFile
+            cmdString = "htseq-count -f sam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam ") + args.refGTF + " 2>" + outFile + " >" + countFile
 
-			htseqCmd = bashSub(cmdString, [''], [''], '', '')
-			print htseqCmd.getCommand()
-			htseqCmd.runCmd("")
-			
-		time = 0
-		print dictSampleSeqFiles
+            htseqCmd = bashSub(cmdString, [''], [''], '', '')
+            print htseqCmd.getCommand()
+            htseqCmd.runCmd("")
+
+        time = 0 # not being used
+        print dictSampleSeqFiles
 
         def clean(self):
                 import glob
                 for f in glob.glob(".screening_cont*"):
                         os.remove(f)
-
-
