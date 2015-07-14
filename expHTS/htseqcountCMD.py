@@ -2,7 +2,7 @@ from validate_app import validateApp
 import os
 from distutils import spawn
 import sys
-from parse_files import parseOut, bringTogether
+from parse_files import parseOutHTseq, bringTogether
 from bashSub import bashSub
 
 
@@ -60,7 +60,9 @@ class htseqCMD:
             exit(1)
 
     def execute(self, args):
-        logFiles = [] # not used
+        time =  0 # not being used
+
+        logFiles = []  # not used
         checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
@@ -78,20 +80,26 @@ class htseqCMD:
             print runSortByName.getCommand()
             runSortByName.runCmd("")
 
-            runView = bashSub("samtools view ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam")], [''], "> " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam") , '/dev/null')
+            runView = bashSub("samtools view ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.bam")], [''], "> " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam"), '/dev/null')
             print runView.getCommand()
             runView.runCmd("")
 
-            cmdString = "htseq-count -f sam -s " + args.stranded + " -a " + args.minQual  + " -t " + args.type  +  " -i " +  args.idattr  + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam ") + args.refGTF + " 2>" + outFile + " >" + countFile
+            cmdString = "htseq-count -f sam -s " + args.stranded + " -a " + args.minQual + " -t " + args.type + " -i " + args.idattr + " -m " + args.mode + " " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid.sam ") + args.refGTF + " 2>" + outFile + " >" + countFile
 
             htseqCmd = bashSub(cmdString, [''], [''], '', '')
             print htseqCmd.getCommand()
             htseqCmd.runCmd("")
 
-        time = 0 # not being used
-        print dictSampleSeqFiles
+            sys.stderr.flush()
+            time += runSortByName.returnTime() + runView.returnTime() + htseqCmd.returnTime()
+
+            logFiles.append(parseOutHTseq(key[1], key[1].split("/")[-1]))
+
+        print logFiles
+        bringTogether(logFiles, os.path.join(args.finalDir, "Counts_Summary.log"))
+
+        print "Total amount of seconds to run all samples"
+        print "Seconds: " + str(time)
 
         def clean(self):
-                import glob
-                for f in glob.glob(".screening_cont*"):
-                        os.remove(f)
+            pass

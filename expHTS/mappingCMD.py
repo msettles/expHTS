@@ -118,12 +118,16 @@ class mappingCMD:
                 runIdxStats.runCmd("")
 
                 sys.stderr.flush()
-                time += terminalString[-1].returnTime()
+                time += runIndex.returnTime() + runIdxStats.returnTime() + terminalString[-1].returnTime()
 
                 logFiles.append(parseOutMapping(key[1], key[1].split("/")[-1]))
 
-            print logFiles
-            bringTogether(logFiles, os.path.join(args.finalDir, "Mapping_Summary.log"))
+        bringTogether(logFiles, os.path.join(args.finalDir, "Mapping_Summary.log"))
 
-            print "Total amount of seconds to run all samples"
-            print "Seconds: " + str(time)
+        print "Total amount of seconds to run all samples"
+        print "Seconds: " + str(time)
+
+            self.clean()
+
+        def clean(self):
+            pass

@@ -177,17 +177,47 @@ def finalParser(f, h, d):
     d += data
 
 
+def htseqCountParse(f, h, d):
+    if not os.path.isfile(f):
+        return
+    f = open(f, 'r')
+    lines = f.readlines()
+    if lines == []:
+        return
+
+    header = ["features", "zero_count_features", "in_feature", "no_feature", "ambiguous", "too_low_aQual", "not_aligned", "alignment_not_unique", "percent_in_feature"]
+    data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    index = 3
+    for e in lines:
+        e = e.split("\t")
+        if '__' in e[0]:
+            data[index] = int(e[1])
+            index += 1
+        elif e[1] == 0:
+            data[0] += 1
+            data[1] += 1
+        else:
+            data[0] += 1
+            data[2] + int(e[1])
+
+    data[9] = float(data[2]/sum(data[2:9]))
+
+    h += header
+    d += data
+
+
 def flagstatsParse(f, h, d):
     if not os.path.isfile(f):
-        return;
+        return
     f = open(f, "r")
     lines = f.readlines()
     if lines == []:
-        return;
+        return
 
-    header = ["Total", "Secondary", "Supplementary", "Duplicates", "Mapped", "Mapped_Percent", "Paired","Read1", "Read2", "Properly_Paired", "Properly_Paired_Percent", "With_itself_and_Mate_mapped", "Singletons", "Singletons_Percent", "With_Mate_Mapped_To_A_Different_chr", "With_Mate_mapped_to_a_different_chr_Mapq>=5" ]
+    header = ["Total", "Secondary", "Supplementary", "Duplicates", "Mapped", "Mapped_Percent", "Paired","Read1", "Read2", "Properly_Paired", "Properly_Paired_Percent", "With_itself_and_Mate_mapped", "Singletons", "Singletons_Percent", "With_Mate_Mapped_To_A_Different_chr", "With_Mate_mapped_to_a_different_chr_Mapq>=5"]
     data = []
-    
+
     for e in lines:  # for each element in line
                 data.append(float(re.findall("\d+", e)[0]))
                 tmp = re.findall("\d+.\d+%", e)
@@ -197,7 +227,6 @@ def flagstatsParse(f, h, d):
     h += header
     d += data
 
-    print data
 
 def printToFile(out, header, data):
     f = open(out, "w")
@@ -231,16 +260,30 @@ def parseOutMapping(base, sample):
     import os
     data = []
     header = []
-    
+
     header.append("Sample")
     data.append(sample)
 
     flagstatsParse(os.path.join(base, sample + ".flagstats"), header, data)
-    
+
     printToFile(os.path.join(base, sample + "_MappingSummaryStats.log"), header, data)
 
     return os.path.join(base, sample + "_MappingSummaryStats.log")
 
+
+def parseOutHTseq(base, sample):
+    import os
+    data = []
+    header = []
+
+    header.append("Sample")
+    data.append(sample)
+
+    htseqCountParse(os.path.join(base, sample + ".counts"), header, data)
+
+    printToFile(os.path.join(base, sample + "_CountingSummaryStats.log"), header, data)
+
+    return os.path.join(base, sample + "_CountingSummaryStats.log")
 
 
 def bringTogether(listFiles, out):
