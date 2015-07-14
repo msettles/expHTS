@@ -130,13 +130,14 @@ def filterParser(f, h, d):
 
 
 def deduperParser(f, h, d):
+    #Final:| reads: 4998890 | duplicates: 393582 | percent: 7.87 | discarded: 1110 | total_seconds: 63.79 | reads/sec: 783
     if not os.path.isfile(f):
         return
     f = open(f, "r")  # open the file
 
     strSearch = ["reads:", "duplicates:", "percent:", "discarded:"]
 
-    header = ["Deduper_discarded", "Deduper_reads", "Deduper_duplicates", "Deduper_Percent_Duplicate"]
+    header = ["Deduper_Reads", "Deduper_Duplicates", "Deduper_Percent_Duplicates", "Deduper_Discarded"]
     data = []
 
     lines = f.readlines()  # read in each line
@@ -145,18 +146,12 @@ def deduperParser(f, h, d):
         return
 
     lines = lines[-1]  # remove the \n at the end of line
-    lines = lines.split("|")  # split by pipe char
+    lines = lines.split("|")[1:5]  # split by pipe char
     index = 0
 
     for e in lines:  # for each element in line
-        if strSearch[index] in e:
-            if strSearch[index] == "percent:":
-                data.append(float(re.findall("\d+.\d+", e)[-1]))
-            else:
-                data.append(int(re.search(r'\d+', e).group()))
-            index += 1
-            if index >= len(strSearch):
-                break
+        e = e.strip()
+        data.append(e.split(' ')[1])
 
     h += header
     d += data
