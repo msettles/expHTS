@@ -6,7 +6,7 @@
 ##############################################################################
 
 #from expHTS_parser import parseArgs
-from expHTS import preprocessCMD, mappingCMD, parseArgs
+from expHTS import preprocessCMD, mappingCMD, htseqCMD, parseArgs
 from samplesheet import sampleSheet
 #from preprocess import *
 
@@ -19,8 +19,10 @@ def main():
    	"""
     	preprocess = preprocessCMD()
 	mapping = mappingCMD()
+	htseq = htseqCMD()
+
     	# Dictionary of subcommands, start with preprocess add more later
-    	commands = {'preprocess': preprocess, 'mapping':mapping}
+    	commands = {'preprocess': preprocess, 'mapping':mapping, 'htseq': htseq}
 
     	args = parseArgs()
 

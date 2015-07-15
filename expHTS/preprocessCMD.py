@@ -58,11 +58,12 @@ class preprocessCMD:
 
         def execute(self, args):
                 logFiles = []
+                time = 0
+
                 checkPreprocessApplications()
                 validate = validateApp()
                 validate.setValidation(True)
                 dictSampleSeqFiles = validate.validateSampleSheet(args.samplesDirectory, args.finalDir, args.samplesFile, args.force, False)
-                time = 0
 
                 for key in dictSampleSeqFiles:
                         check_dir(args.finalDir)
@@ -132,7 +133,7 @@ class preprocessCMD:
                                 time += terminalString[-1].returnTime()
                                 logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
 
-                bringTogether(logFiles, os.path.join(key[1].split("/")[0], "Preprocessing_Summary.log"))
+                bringTogether(logFiles, os.path.join(args.finalDir, "Preprocessing_Summary.log"))
                 print "Total amount of seconds to run all samples"
                 print "Seconds: " + str(time)
 

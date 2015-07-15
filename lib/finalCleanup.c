@@ -252,11 +252,13 @@ void getStats(struct reads *r, struct stats *s) {
 
         if ((r->r1).r_header != NULL) {
                 readStats(r->r1, s);
-	}
+               // ((s->R1_length)[(r->r1).r_len])++;
+	    }
 
         if ((r->r2).r_header != NULL) {
-                readStats(r->r1, s);
-	}
+                readStats(r->r2, s);
+               // ((s->R2_length)[(r->r2).r_len])++;
+	    }
 
 
 
@@ -401,8 +403,6 @@ char *reverse(char *read) {
 
 int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, int tmpforcePairs, int tmpPolyATTrim) {
         int forcePairs = tmpforcePairs;
-	//PolyATTrim = tmpPolyATTrim;
-	//PolyATTrim = tmpPolyATTrim;
 
         FILE *f = fopen(devFile, "r");
         //FILE *f = stderr;
@@ -413,7 +413,10 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 
         struct reads r;
         struct stats s;
+        int sum = 0, R1_len = 0, R2_len = 0, SE_len = 0;
+
         statsConstruct(&s);
+	PolyATTrim = tmpPolyATTrim;
 
         while (grabTab(f, &r, &s)) {
                 if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
@@ -429,9 +432,17 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			if (R2 == NULL) {
         			R2 = fopen(strR2, "w");
 			}
-			fprintf(R1, "@N%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-			fprintf(R2, "@N%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-                } else if (forcePairs && (r.r1).r_header != NULL) {
+
+			if ((r.r1).r_header[0] == '@') {
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                	} else {
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			}
+
+
+		} else if (forcePairs && (r.r1).r_header != NULL) {
                         s.numForcedPairs++;
                         int loc = (strlen((r.r1).r_seq))/2;
                         char cSeq = (r.r1).r_seq[loc];
@@ -444,27 +455,44 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         			R2 = fopen(strR2, "w");
 			}
 
-                        (r.r1).r_seq[loc] = '\0';
-                        (r.r1).r_qual[loc] = '\0';
-                        fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                        (r.r1).r_seq[loc] = cSeq;
-                        (r.r1).r_qual[loc] = cQual;
-
-                        fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
-			
+			if ((r.r1).r_header == '@') {
+				(r.r1).r_seq[loc] = '\0';
+				(r.r1).r_qual[loc] = '\0';
+				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				(r.r1).r_seq[loc] = cSeq;
+				(r.r1).r_qual[loc] = cQual;
+				fprintf(R2, "%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+			} else {
+				(r.r1).r_seq[loc] = '\0';
+				(r.r1).r_qual[loc] = '\0';
+				fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				(r.r1).r_seq[loc] = cSeq;
+				(r.r1).r_qual[loc] = cQual;
+				fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+			}			
                 } else if ((r.r2).r_header != NULL) {
 			if (SE == NULL) {
                 		SE = fopen(strSE, "w");
 			}
                         s.se_kept++;
-                        fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+
+			if ((r.r2).r_header == '@') {
+                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                        } else {
+				fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			}
+
                 } else if ((r.r1).r_header != NULL) {
 			if (SE == NULL) {
                 		SE = fopen(strSE, "w");
 			}
                         s.se_kept++;
-                        fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                }
+			if ((r.r1).r_header == '@') {
+                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                	} else {
+                        	fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+			}
+		}
 
         }
 
@@ -472,8 +500,16 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 		log = fopen(logFile, "w");
 	}
 
+    for (sum = 0; sum < 700; sum++) {
+        R1_len += (s.R1_length[sum] * sum);
+        R2_len += (s.R2_length[sum] * sum);
+        SE_len += (s.SE_length[sum] * sum);
+    }
+
         fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\n");
-        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
+        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
+        //fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\tR1_Len\tR2_Len\n");
+        //fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
 		(float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
 
 	if (f != NULL) {
@@ -490,6 +526,9 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
                 fclose(SE);
         }
 
+        if (log != NULL) {
+            fclose(log);
+        }
 }
    
 

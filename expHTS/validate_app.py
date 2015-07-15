@@ -11,6 +11,30 @@ class validateApp:
 		self.verbose = True
 
 
+
+	def validateSampleSheetHTSeq(self, dirSample, finalDir, sampleSheet, force):
+		linenum = 0
+		if not os.path.exists(dirSample):
+			self.exitTime("Directory " + dirSample + " is not found")
+		if os.path.exists(sampleSheet):
+			f = open(sampleSheet, "r");
+		else:
+			self.exitTime("No sample sheet named " + sampleSheet + " was found")
+
+		
+		for e in f.readlines():
+			if linenum != 0:
+				self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force, True)
+			linenum += 1
+
+
+		for key in self.sampleFiles:
+			self.sampleFiles[key].sort(key=lambda x: len(x))
+		
+		return self.sampleFiles
+
+		
+
 	def validateSampleSheet(self, dirSample, finalDir, sampleSheet, force, afterPreprocess):
 		linenum = 0
 		if not os.path.exists(dirSample):
@@ -24,7 +48,7 @@ class validateApp:
 		for e in f.readlines():
 			if linenum != 0:
 				if afterPreprocess:
-					self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force)
+					self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force, False)
 				else:
 					self.sampleSequenceID(dirSample, finalDir, e.split("\t"), force)
 			linenum += 1
@@ -37,16 +61,20 @@ class validateApp:
 
 
 
-        def sampleSequenceIDafterPreprocess(self, dirSample, finalDir, seqID, force):
+        def sampleSequenceIDafterPreprocess(self, dirSample, finalDir, seqID, force, htseq):
                 if seqID[0][0] == "#":
                         pass
                 elif len(seqID) >= 2:
                         
-                        seqID[0] = os.path.join(dirSample, seqID[1])
+                        seqID[0] = os.path.join(dirSample, seqID[1].rstrip())
                         seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
 
                         self.finalDirTest(seqID[1], force)
-                        self.directoryFiles(seqID)
+			if htseq == False:
+                        	self.directoryFiles(seqID)
+			else:
+				self.directoryFilesHTSeq(seqID, seqID[1].split('/')[-1]);
+
                 else:
                         self.exitTime("There wasn't two columns in the sample file file")
 
@@ -72,12 +100,38 @@ class validateApp:
 			self.exitTime(sampleID + " was all ready created. Use the -w or --overwrite option to overwrite")
 		elif os.path.exists(sampleID):
 			print "Warning"
-			print "Overwrite was turned on - overwriting " + sampleID + "\n\n"
+			print "Overwrite was turned on - overwriting " + sampleID + "\n"
 			
 			
 
 	#sets up the directory dictionary
 	#set up key with tuple (sample and seq)
+	def directoryFilesHTSeq(self, sampleSeq, fileName):
+		sampleSeq = tuple(sampleSeq)
+		#print sampleSeq
+		directoryTest = sampleSeq[0].rstrip();
+		#fastqCount insures at least one fastq files is under the directory
+		bamCount = 0
+		if self.testDirectory(directoryTest):
+			for subdir, dir, files in os.walk(directoryTest):
+				for file in files:
+					file = os.path.abspath(os.path.join(directoryTest, file))
+					if ".bam" in file and fileName in file and not ".bai" in file:
+						bamCount += 1
+						if not sampleSeq in self.sampleFiles:
+							self.sampleFiles[sampleSeq] = []
+						
+						self.sampleFiles[sampleSeq].append(file)
+
+			if (bamCount == 0):
+				self.exitTime("No fastq files were found under this directory - " + directoryTest)
+
+		else:
+			self.exitTime("Directory " + directoryTest + " does not exists")
+			
+
+
+
 	def directoryFiles(self, sampleSeq):
 		sampleSeq = tuple(sampleSeq)
 		#print sampleSeq
