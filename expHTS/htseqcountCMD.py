@@ -102,7 +102,6 @@ class htseqCMD:
 
             logFiles.append(parseOutHTseq(keys[1], keys[1].split("/")[-1]))
 
-        print logFiles
         bringTogether(logFiles, os.path.join(args.finalDir, "Counts_Summary.log"))
 
         print "Total amount of seconds to run all samples"
