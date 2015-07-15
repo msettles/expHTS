@@ -185,17 +185,18 @@ def htseqCountParse(f, h, d):
     index = 3
     for e in lines:
         e = e.split("\t")
+
         if '__' in e[0]:
-            data[index] = int(e[1])
+            data[index] = int(e[1].strip())
             index += 1
-        elif e[1] == 0:
+        elif int(e[1].strip()) == 0:
             data[0] += 1
             data[1] += 1
         else:
             data[0] += 1
-            data[2] + int(e[1])
+            data[2] += int(e[1].strip())
 
-    data[9] = float(data[2]/sum(data[2:9]))
+    data[9] = float(data[2])/float(sum(data[2:9]))
 
     h += header
     d += data

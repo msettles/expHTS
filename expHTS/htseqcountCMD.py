@@ -79,7 +79,11 @@ class htseqCMD:
             countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
 
             # runSortByName = bashSub("samtools view -bF 0x100", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
-            runSortByName = bashSub("samtools sort -n", [bamFile], [''], "| samtools sort -n - " + os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+            runSortByName = bashSub("samtools sort -n", [bamFile], [''],  os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid"), '/dev/null')
+            print runSortByName.getCommand()
+            runSortByName.runCmd("")
+
+            runSortByName = bashSub("samtools sort -n ", [os.path.join(keys[1], keys[1].split('/')[-1] + ".byreadid")], [''], os.path.join(keys[1], keys[1].split('/')[-1]) + ".byreadid" , '/dev/null')
             print runSortByName.getCommand()
             runSortByName.runCmd("")
 
@@ -96,7 +100,7 @@ class htseqCMD:
             sys.stderr.flush()
             time += runSortByName.returnTime() + runView.returnTime() + htseqCmd.returnTime()
 
-            logFiles.append(parseOutHTseq(key[1], key[1].split("/")[-1]))
+            logFiles.append(parseOutHTseq(keys[1], keys[1].split("/")[-1]))
 
         print logFiles
         bringTogether(logFiles, os.path.join(args.finalDir, "Counts_Summary.log"))
@@ -104,7 +108,3 @@ class htseqCMD:
         print "Total amount of seconds to run all samples"
         print "Seconds: " + str(time)
 
-        self.clean()
-
-        def clean(self):
-            pass
