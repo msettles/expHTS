@@ -86,7 +86,9 @@ class preprocessCMD:
 
                                 mapper = bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null")
                                 cFilter = bashSub(extract_unmapped, mapper.processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))
-                                deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
+
+				if args.skipDup == False:
+                                	deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
 
                                 sickleArgs = " -o " + os.path.join(key[1], "SE_not_merged.fastq")  +  " -t sanger -l " + args.minLength
                                 if args.polyTrim:

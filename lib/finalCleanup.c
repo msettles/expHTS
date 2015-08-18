@@ -198,8 +198,6 @@ void split(char *strTest, char *delimiter, struct reads *r) {
         }
 
 
-        //free(token);
-
 
         for (i = 0; i < count; i++) {
                free(results[i]);
@@ -208,8 +206,6 @@ void split(char *strTest, char *delimiter, struct reads *r) {
 }
 
 int minLen = 30;
-
-
 
 
 void readStats(struct read r, struct stats *s) {
@@ -269,6 +265,10 @@ void getStats(struct reads *r, struct stats *s) {
 
 void PolyATCuts(struct reads *r, int minLenOfTail, int errorsAllowed, struct stats *s) {
         int cut = trim_poly_t((r->r1).r_seq, minLenOfTail, errorsAllowed, 0, (r->r1).r_len);
+
+	if ((r->r1).r_header == NULL) {
+		printf("oh shoot!\n");
+	}
 
         if (cut != 0) {
                 s->polyTTrimmed += 1;
@@ -419,9 +419,10 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 	PolyATTrim = tmpPolyATTrim;
 
         while (grabTab(f, &r, &s)) {
+
                 if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
                         s.pe_kept++;
-
+			
 			if (strlen((r.r1).r_qual) == 0) {
 				printf("2. im going to destory you\n");
 			}
