@@ -438,8 +438,8 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
 				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
                 	} else {
-				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+				fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
 			}
 
 
@@ -456,7 +456,7 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         			R2 = fopen(strR2, "w");
 			}
 
-			if ((r.r1).r_header == '@') {
+			if ((r.r1).r_header[0] == '@') {
 				(r.r1).r_seq[loc] = '\0';
 				(r.r1).r_qual[loc] = '\0';
 				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
@@ -477,10 +477,14 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			}
                         s.se_kept++;
 
-			if ((r.r2).r_header == '@') {
+			if ((r.r2).r_header[0] == '@') {
                         	fprintf(SE, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
                         } else {
 				fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+			}
+
+			if ((r.r2).r_qual[strlen((r.r2).r_qual)-1] != '\n') {
+				fprintf(SE, "\n");
 			}
 
                 } else if ((r.r1).r_header != NULL) {
@@ -488,11 +492,17 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
                 		SE = fopen(strSE, "w");
 			}
                         s.se_kept++;
-			if ((r.r1).r_header == '@') {
+			if ((r.r1).r_header[0] == '@') {
                         	fprintf(SE, "%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
                 	} else {
                         	fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
 			}
+
+			if ((r.r1).r_qual[strlen((r.r1).r_qual)-1] != '\n') {
+				printf("%c", (r.r2).r_qual[strlen((r.r2).r_qual)-1]);
+				fprintf(SE, "\n");
+			}
+
 		}
 
         }
@@ -538,10 +548,11 @@ static PyObject *
 	const char *logFile, *devFile, *R1, *R2, *SE;
 	int logFileSize, devFileSize, r1_size, r2_size, se_size;
 	int polyAT = 0, split = 0;
-
+	
 	if (!PyArg_ParseTuple(args, "iiis#s#s#s#s#", &polyAT, &split, &minLen, &logFile, &logFileSize, &devFile, &devFileSize, &R1, &r1_size, &R2, &r2_size, &SE, &se_size)) {
 		return NULL;		
 	}
+	split = 0;
 	clean(devFile, logFile, R1, R2, SE, split, polyAT);
 	return args;
 }
