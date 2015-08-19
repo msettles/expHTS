@@ -423,10 +423,6 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
                 if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
                         s.pe_kept++;
 			
-			if (strlen((r.r1).r_qual) == 0) {
-				printf("2. im going to destory you\n");
-			}
-			
 			if (R1 == NULL) {
         			R1 = fopen(strR1, "w");
 			}		
@@ -435,11 +431,11 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			}
 
 			if ((r.r1).r_header[0] == '@') {
-				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+				fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
                 	} else {
-				fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				fprintf(R2, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+				fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
 			}
 
 
@@ -459,17 +455,17 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			if ((r.r1).r_header[0] == '@') {
 				(r.r1).r_seq[loc] = '\0';
 				(r.r1).r_qual[loc] = '\0';
-				fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
 				(r.r1).r_seq[loc] = cSeq;
 				(r.r1).r_qual[loc] = cQual;
-				fprintf(R2, "%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+				fprintf(R2, "%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
 			} else {
 				(r.r1).r_seq[loc] = '\0';
 				(r.r1).r_qual[loc] = '\0';
-				fprintf(R1, "@%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+				fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
 				(r.r1).r_seq[loc] = cSeq;
 				(r.r1).r_qual[loc] = cQual;
-				fprintf(R2, "@%s\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+				fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
 			}			
                 } else if ((r.r2).r_header != NULL) {
 			if (SE == NULL) {
