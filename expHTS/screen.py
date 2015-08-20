@@ -135,15 +135,7 @@ class screening:
 		if not os.path.exists(fastaFile + ".4.bt2"):
 			combine.runCmd("")
 			build.runCmd("")
-
-		bowtie.runCmd("")
-		print bowtie.getCommand();
-
-
 	
-		# source.runCmd("")
-		# load.runCmd("")
-
 		if not os.path.exists(fastaFile):
 			combine.runCmd("")
 			build.runCmd("")
@@ -177,8 +169,6 @@ def main():
 	else:
 		print "Please specifiy reads"
 		exit(1)
-
-
 
 
 

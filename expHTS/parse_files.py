@@ -135,9 +135,9 @@ def deduperParser(f, h, d):
         return
     f = open(f, "r")  # open the file
 
-    strSearch = ["reads:", "duplicates:", "percent:", "discarded:"]
+    strSearch = ["reads:", "duplicates:", "reads_written:", "percent:", "discarded:"]
 
-    header = ["Deduper_Reads", "Deduper_Duplicates", "Deduper_Percent_Duplicates", "Deduper_Discarded"]
+    header = ["Deduper_Reads", "Deduper_Duplicates", "Deduper_Outputted_Reads",  "Deduper_Percent_Duplicates", "Deduper_Discarded"]
     data = []
 
     lines = f.readlines()  # read in each line
@@ -146,13 +146,12 @@ def deduperParser(f, h, d):
         return
 
     lines = lines[-1]  # remove the \n at the end of line
-    lines = lines.split("|")[1:5]  # split by pipe char
+    lines = lines.split("|")[1:6]  # split by pipe char
     index = 0
 
     for e in lines:  # for each element in line
         e = e.strip()
         data.append(e.split(' ')[1])
-
     h += header
     d += data
 
@@ -253,6 +252,8 @@ def parseOut(base, sample):
     flashParser(os.path.join(base, "flash_info.log"), header, data)
     finalParser(os.path.join(base, "finalCleanup.log"), header, data)
 
+
+    data = data[:len(data)-2]
     printToFile(os.path.join(base, sample + "_SummaryStats.log"), header, data)
 
     return os.path.join(base, sample + "_SummaryStats.log")
