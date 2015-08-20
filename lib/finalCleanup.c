@@ -431,8 +431,16 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			}
 
 			if ((r.r1).r_header[0] == '@') {
-				fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				fprintf(R2, "%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+
+				if ((r.r1).r_header[strlen((r.r1).r_header)-1] == '1') {
+					fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+					(r.r2).r_header[strlen((r.r2).r_header)-1] = '2';
+					fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+				} else {
+					fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+					fprintf(R2, "%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+				}
+
                 	} else {
 				fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
 				fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
