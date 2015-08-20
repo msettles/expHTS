@@ -503,7 +503,6 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 			}
 
 			if ((r.r1).r_qual[strlen((r.r1).r_qual)-1] != '\n') {
-				printf("%c", (r.r2).r_qual[strlen((r.r2).r_qual)-1]);
 				fprintf(SE, "\n");
 			}
 
