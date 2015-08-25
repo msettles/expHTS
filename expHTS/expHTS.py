@@ -5,6 +5,7 @@ import os
 from preprocessCMD import preprocessCMD
 from mappingCMD import mappingCMD
 from htseqcountCMD import htseqCMD
+from spadesCMD import spadesCMD
 
 version_num = "0.0"
 """
@@ -33,6 +34,7 @@ pgid = os.getpgid(os.getpid())
 
 
 def signal_handler(signal, frame):
+
     # the signal handler to kill the entire process group
     # incase Cntr + C is sent (sub processes aren't killed
     print "Cntr + c was hit - ending process group number " + str(pgid)
@@ -77,7 +79,7 @@ def mappingParser(subparser):
 
 def preprocessParser(subparser):
     expHTS_parser = subparser.add_parser('preprocess', help='runs the expHTS preprocessing pipeline')
-    expHTS_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
+    expHTS_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
     expHTS_parser.add_argument('-S', '--forceSplit', help='Forces splits of SE reads [default FALSE]', action='store_true', dest='forceSplit', default=False)
     expHTS_parser.add_argument('-A', '--adapterfasta', help='folder name with adapter sequences in fasta format [default truseq adapter sequence]', action='store', type=str, default=r'<(printf ">TruSeq_forward_contam\nAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC[NNNNNN]ATCTCGTATGCCGTCTTCTGCTTGAAAAA\n>TruSeq_reverse_contam\nAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATTAAAAA")',  dest='adapter', metavar='CONTAMNANTS-FOLDER')
     expHTS_parser.add_argument('-d', '--directory', help='Directory where the raw sequence data is stored [defualt 00-RawData]', action='store', type=str, dest='samplesDirectory', metavar='DIRECTORY', default='00-RawData')
@@ -94,19 +96,31 @@ def preprocessParser(subparser):
 
     return expHTS_parser
 
+def spadesParser(subparser):
+
+    spades_parser = subparser.add_parser('spades', help='runs spades assembler')
+    spades_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
+    spades_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [default 02-Cleaned]', action='store', dest='readFolder', default="02-Cleaned")
+    spades_parser.add_argument('-n', '--spadesFolder', help='Directory where Spades output will be stored [defualt 03-Spades]', action='store', type=str, dest="spadesFolder", metavar='DIRECTORY', default='03-Spades')
+    spades_parser.add_argument('-p', '--processors', help='Number of processors to be used by Spades [default 10]', action='store', type=str, dest="threads", metavar="PROCESSORS", default="10")
+    spades_parser.add_argument('-e', '--error-correction', help='Perform error correction prior to assembly [default FALSE]', action='store_true', dest="errorCorrection", default=False)
+    spades_parser.add_argument('-l', '--large_contigs_size', help='Size of contig considered "large" contigs [default 500]', action='store', type=str, dest="largeContigs", metavar="LARGE_CONTIG")
+    spades_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    
+    return spades_parser
 
 def parseArgs():
+    revision_date = "08252015"
     parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
-    parser.add_argument("--version", action="version", version="%(progs)s Version " + version_num)
+    parser.add_argument("--version", action="version", version="expHTS Version v" + version_num + "." + revision_date )
     subparsers = parser.add_subparsers(help='commands', dest='command')
 
     preprocessParser(subparsers)
     mappingParser(subparsers)
     htseqParser(subparsers)
-
+    spadesParser(subparsers)
     args = parser.parse_args()
     return args
-
 
 def main():
     """
@@ -115,11 +129,14 @@ def main():
     preprocess = preprocessCMD()
     mapping = mappingCMD()
     htseq = htseqCMD()
+    spades = spadesCMD()
 
-    commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq}
+    commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq, "spades": spades}
 
     args = parseArgs()
 
     commands[args.command].execute(args)
+
+
 
 signal.signal(signal.SIGINT, signal_handler)

@@ -124,7 +124,7 @@ class validateApp:
 						self.sampleFiles[sampleSeq].append(file)
 
 			if (bamCount == 0):
-				self.exitTime("No fastq files were found under this directory - " + directoryTest)
+				self.exitTime("No bam files were found under this directory - " + directoryTest)
 
 		else:
 			self.exitTime("Directory " + directoryTest + " does not exists")
@@ -142,7 +142,7 @@ class validateApp:
 			for subdir, dir, files in os.walk(directoryTest):
 				for file in files:
 					file = os.path.abspath(os.path.join(directoryTest, file))
-					if "_R1" in file and ".fastq" in file:
+					if ("_R1" in file or "_SE") and ".fastq" in file:
 						fastqCount += 1
 						if not sampleSeq in self.sampleFiles:
 							self.sampleFiles[sampleSeq] = []
@@ -166,6 +166,8 @@ class validateApp:
 
 	#returns 2 elements in list if paired end reads or 1 element in list if it is a SE
 	def isPairedEnd(self, fileRead1):
+
+
 		file2 = fileRead1.replace("_R1", "_R2")
 		if os.path.exists(file2):
 			return [fileRead1, file2]
