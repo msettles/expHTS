@@ -264,7 +264,7 @@ void getStats(struct reads *r, struct stats *s) {
 	    }
 
         if ((r->r2).r_header != NULL) {
-                if ((r->r1).r_len == -1) {
+                if ((r->r2).r_len == -1) {
                     return;
                 }
                 readStats(r->r2, s);
