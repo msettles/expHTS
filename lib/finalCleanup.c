@@ -233,21 +233,29 @@ void getStats(struct reads *r, struct stats *s) {
         if ((r->r1).r_len < minLen && (r->r2).r_header == NULL) {
                 (s->se_discarded)++;
                 (r->r1).r_header = NULL;
+                return;
         } else if ((r->r1).r_len < minLen) {
                 (s->r1_discarded)++;
                 (r->r1).r_header = NULL;
-		(r->r2).r_header = NULL;
+		        (r->r2).r_header = NULL;
+                return;
         }
 
         if ((r->r2).r_header != NULL && (r->r2).r_len < minLen) {
                 (s->r2_discarded)++;
                 (r->r1).r_header = NULL;
                 (r->r2).r_header = NULL;
+                 return;
         }
 
 
         if ((r->r1).r_header != NULL) {
+                if ((r->r1).r_len != -1) {
+                    return;
+                }
+
                 readStats(r->r1, s);
+
                 if ((r->r2).r_header != NULL) {
                     ((s->R1_length)[(r->r1).r_len])++;
                 } else {
@@ -256,12 +264,16 @@ void getStats(struct reads *r, struct stats *s) {
 	    }
 
         if ((r->r2).r_header != NULL) {
+                if ((r->r1).r_len != -1) {
+                    return;
+                }
                 readStats(r->r2, s);
-                ((s->R2_length)[(r->r2).r_len])++;
+                if ((r->r1).r_header != NULL) {
+                    ((s->R2_length)[(r->r2).r_len])++;
+                } else {
+                    ((s->SE_length)[(r->r2).r_len])++;
+                }
 	    }
-
-
-
 
 }
 
