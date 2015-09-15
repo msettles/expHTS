@@ -5,9 +5,11 @@ import sys
 from parse_files import parseOutMapping, bringTogether
 from bashSub import bashSub
 
-'''
-TODO: figure out why htseq isn't accepting the bam file, we have to first convert to sam
-'''
+
+
+
+
+
 
 
 def checkPreprocessApplications():
@@ -100,32 +102,79 @@ class mappingCMD:
             meta = key[1]  # NOT USED SO FAR
 
             fileEnding = key[1].split("/")[-1]
-            endString = ' 2>/dev/null | tee >(grep "^@" >' + os.path.join(key[1], fileEnding + ".header") + ') | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding)
+            endString = ' 2>/dev/null | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding + ".bam")
             SEandPE = returnReads(dictSampleSeqFiles[key])
+            files = dictSampleSeqFiles[key][0]
+            RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
 
             if SEandPE[0] != "":
                 terminalString = []
-            if SEandPE[1] != "":
-                RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
-
+            if len(files) == 3 and args.forcePairs:
+                awkR1 = """
+                awk '{
+                   print $0
+                      getline
+                         print substr($0, 0, length/2)
+                              getline
+                                print $0 
+                                  getline
+                                    print substr($0, 0, length/2)
+                                     }' """ + files[2]
+                awkR2 = """awk 'BEGIN {
+                  j = n = split("A C G T", t)
+                    for (i = 0; ++i <= n;)
+                        map[t[i]] = t[j--]
+                          }
+                            {
+                               print $0
+                                  getline
+                                     for (i = length; i > length/2 ; i--) {
+                                         printf "%s", map[substr($0, i, 1)]
+                                            }
+                                              printf "\\n"
+                                                getline
+                                                  print $0 
+                                                    getline
+                                                      for (i = length; i > length/2; i--) {  
+                                                          printf "%s", substr($0, i, 1)
+                                                            }
+                                                              printf "\\n"
+                                                               }'  """ + files[2]
                 terminalString = []
+                terminalString.append(bashSub("bwa mem -M " + RGstring, [str(int(args.threads))], ['-t'], args.refFasta + " <(cat " + files[0] + " <(" +  awkR1 + ")) <(cat " + files[1] + " <(" + awkR2 + ")) "  + endString, "/dev/null"))
+                runIndex=bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
+                runIdxStats=bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
 
+
+            elif len(files) == 3:
+                terminalString = []
+                terminalString.append(bashSub("bwa mem -M " + RGstring, [str(int(args.threads)/2)], ['-t'], args.refFasta + " " + files[0] + " " + files[1] , "/dev/null"))
+                terminalString.append(bashSub("bwa mem -M " + RGstring, [str(int(args.threads)/2)], ['-t'], args.refFasta + " " + files[2] , "/dev/null"))
+                terminalString.append(bashSub("samtools merge - " + terminalString[-1].processSub()[0] + " " + terminalString[-2].processSub()[0] + " " + endString , [""], [""], "", "/dev/null"))
+
+                runIndex=bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
+                runIdxStats=bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
+
+            elif SEandPE[1] != "":
+                RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
+                terminalString = []
                 terminalString.append(bashSub("bwa mem -M " + RGstring, [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + endString, "/dev/null"))
                 runIndex = bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
                 runIdxStats = bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
 
-                print "___ PE COMMANDS ___"
-                print terminalString[-1].getCommand()
-                terminalString[-1].runCmd("")
-                print runIndex.getCommand()
-                runIndex.runCmd("")
-                print runIdxStats.getCommand()
-                runIdxStats.runCmd("")
 
-                sys.stderr.flush()
-                time += runIndex.returnTime() + runIdxStats.returnTime() + terminalString[-1].returnTime()
+            print "___ PE COMMANDS ___"
+            print terminalString[-1].getCommand()
+            terminalString[-1].runCmd("")
+            print runIndex.getCommand()
+            runIndex.runCmd("")
+            print runIdxStats.getCommand()
+            runIdxStats.runCmd("")
 
-                logFiles.append(parseOutMapping(key[1], key[1].split("/")[-1]))
+            sys.stderr.flush()
+            time += runIndex.returnTime() + runIdxStats.returnTime() + terminalString[-1].returnTime()
+
+            logFiles.append(parseOutMapping(key[1], key[1].split("/")[-1]))
 
         bringTogether(logFiles, os.path.join(args.finalDir, "Mapping_Summary.log"))
 

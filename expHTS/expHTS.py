@@ -72,6 +72,7 @@ def mappingParser(subparser):
     mapping_parser.add_argument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatability with htseq-count [default %(default)s]", action='store_true', dest="ignoreSingles", default=False)
     mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default 03-BWA]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
     mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    mapping_parser.add_argument('-S', '--forcePairs', help='Force pairs [default FALSE]', action='store_true', dest='forcePairs', default=False)
     mapping_parser.add_argument('-t', '--threads', help='Number of threads to be used [Default 20]', action='store', type=str, dest='threads', metavar='THREADS', default='20')
 
     return mapping_parser

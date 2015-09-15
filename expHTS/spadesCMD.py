@@ -76,6 +76,7 @@ class spadesCMD:
             #countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
             print dictSampleSeqFiles[keys][0][0]
             print dictSampleSeqFiles[keys][0][1]
+            print dictSampleSeqFiles[keys][0][2]
 
             cmdString = "spades.py --careful -t " + args.threads + " -o " + args.spadesFolder
 
