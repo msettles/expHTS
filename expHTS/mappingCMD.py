@@ -102,7 +102,7 @@ class mappingCMD:
             meta = key[1]  # NOT USED SO FAR
 
             fileEnding = key[1].split("/")[-1]
-            endString = ' 2>/dev/null | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding + ".bam")
+            endString = ' 2>/dev/null | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding)
             SEandPE = returnReads(dictSampleSeqFiles[key])
             files = dictSampleSeqFiles[key][0]
             RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
@@ -112,7 +112,7 @@ class mappingCMD:
             if len(files) == 3 and args.forcePairs:
                 awkR1 = """
                 awk '{
-                   print $0
+                   printf "%s/1\\n", $0
                       getline
                          print substr($0, 0, length/2)
                               getline
@@ -126,7 +126,7 @@ class mappingCMD:
                         map[t[i]] = t[j--]
                           }
                             {
-                               print $0
+                               printf "%s/2\\n", $0
                                   getline
                                      for (i = length; i > length/2 ; i--) {
                                          printf "%s", map[substr($0, i, 1)]

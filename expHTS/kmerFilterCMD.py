@@ -50,7 +50,7 @@ def check_dir(Dir):
         os.mkdir(Dir)
 
 
-class spadesCMD:
+class kmerFilterCMD:
 
     def __init__(self):
         self.metaDataFolder = "MetaData"
@@ -67,24 +67,23 @@ class spadesCMD:
         # checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
-        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.spadesFolder, args.samplesFile, args.force, True)
+        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.kmerFolder, args.samplesFile, args.force, True)
 
         for keys in dictSampleSeqFiles.keys():
-            check_dir(args.spadesFolder)
+            check_dir(args.kmerFolder)
             check_dir(keys[1])
             terminal = []
             #countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
 
             if (len(dictSampleSeqFiles[keys][0]) == 3):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + args.spadesFolder, ''))
+                terminal.append(bashSub("kmer_filter", dictSampleSeqFiles[keys][0], ['-1', '-2', '-f'], "--normalize " + args.depth + " --k_len " + args.k_len + ' -o ' + keys[1] , ''))
             elif (len(dictSampleSeqFiles[keys][0]) == 2):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--careful -t " + args.threads + " -o " + args.spadesFolder, ''))
+                terminal.append(bashSub("kmer_filter", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--normalize " + args.depth + " --k_len " + args.k_len + ' -o ' + keys[1] , ''))
 
             print terminal[-1].getCommand()
             terminal[-1].runCmd("")
             sys.stderr.flush()
             #time += runSortByName.returnTime() + runView.returnTime() + htseqCmd.returnTime()
-
             #logFiles.append(parseOutHTseq(keys[1], keys[1].split("/")[-1]))
 
         #bringTogether(logFiles, os.path.join(args.finalDir, "Counts_Summary.log"))

@@ -6,7 +6,8 @@ from preprocessCMD import preprocessCMD
 from mappingCMD import mappingCMD
 from htseqcountCMD import htseqCMD
 from spadesCMD import spadesCMD
-
+from forcepairCMD import forcepairCMD
+from kmerFilterCMD import kmerFilterCMD
 version_num = "0.0"
 """
 Preprocessing of fastq sequence files for a single sample,
@@ -110,6 +111,28 @@ def spadesParser(subparser):
     
     return spades_parser
 
+def fpParser(subparser):
+
+    fp_parser = subparser.add_parser('forcepairs', help='creates new directory with forced pairs (split SE reads into R1 and R2)')
+    fp_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
+    fp_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [default 02-Cleaned]', action='store', dest='readFolder', default="02-Cleaned")
+    fp_parser.add_argument('-n', '--forcepairFolder', help='Directory where Forced Pairs output will be stored [defualt 03-ForcedPairs]', action='store', type=str, dest="forcepairFolder", metavar='DIRECTORY', default='03-ForcedPairs')
+    fp_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    
+    return fp_parser
+
+def kmerParser(subparser):
+
+    kmer_parser = subparser.add_parser('kmernorm', help='Normilizes kmers')
+    kmer_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
+    kmer_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [default 02-Cleaned]', action='store', dest='readFolder', default="02-Cleaned")
+    kmer_parser.add_argument('-k', '--kmernormFolder', help='Directory where Kmer output will be stored [defualt 03-Kmer_Filter]', action='store', type=str, dest="kmerFolder", metavar='DIRECTORY', default='03-Kmer_Filter')
+    kmer_parser.add_argument('-d', '--depth', help='Normilization depth', action='store', type=str, dest="depth", metavar='DEPTH', default='20')
+    kmer_parser.add_argument('-l', '--k_len', help='Kmer length depth', action='store', type=str, dest="k_len", metavar='KMER LENGTH', default='15')
+    kmer_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    
+    return kmer_parser
+
 def parseArgs():
     revision_date = "08252015"
     parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
@@ -120,6 +143,9 @@ def parseArgs():
     mappingParser(subparsers)
     htseqParser(subparsers)
     spadesParser(subparsers)
+    fpParser(subparsers)
+    kmerParser(subparsers)
+
     args = parser.parse_args()
     return args
 
@@ -131,8 +157,9 @@ def main():
     mapping = mappingCMD()
     htseq = htseqCMD()
     spades = spadesCMD()
-
-    commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq, "spades": spades}
+    forcepairs = forcepairCMD()
+    kmernorm = kmerFilterCMD()
+    commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq, "spades": spades, "forcepairs": forcepairs, 'kmernorm': kmernorm}
 
     args = parseArgs()
 
