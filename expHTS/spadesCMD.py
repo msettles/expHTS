@@ -55,10 +55,6 @@ class spadesCMD:
     def __init__(self):
         self.metaDataFolder = "MetaData"
 
-    def index(self, ref):
-        if not os.path.exists(ref):
-            print "Would you mind adding a gtf file? (-R) Thank you."
-            exit(1)
 
     def execute(self, args):
         time =  0
@@ -76,9 +72,9 @@ class spadesCMD:
             #countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
 
             if (len(dictSampleSeqFiles[keys][0]) == 3):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + args.spadesFolder, ''))
+                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + args.spadesFolder + " -m " + args.memory, ''))
             elif (len(dictSampleSeqFiles[keys][0]) == 2):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--careful -t " + args.threads + " -o " + args.spadesFolder, ''))
+                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--careful -t " + args.threads + " -o " + args.spadesFolder + " -m " + args.memory, ''))
 
             print terminal[-1].getCommand()
             terminal[-1].runCmd("")

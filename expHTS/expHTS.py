@@ -108,6 +108,7 @@ def spadesParser(subparser):
     spades_parser.add_argument('-e', '--error-correction', help='Perform error correction prior to assembly [default FALSE]', action='store_true', dest="errorCorrection", default=False)
     spades_parser.add_argument('-l', '--large_contigs_size', help='Size of contig considered "large" contigs [default 500]', action='store', type=str, dest="largeContigs", metavar="LARGE_CONTIG")
     spades_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    spades_parser.add_argument('-m', '--memory', help='RAM limit for spades  [default: %(default)s]', action='store', type=str, dest="memory", metavar="RAM", default="250")
     
     return spades_parser
 
