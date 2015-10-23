@@ -68,16 +68,18 @@ class spadesCMD:
         validate.setValidation(True)
         dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.spadesFolder, args.samplesFile, args.force, True)
 
+        #keys tuple 0 location being input folder
+        #1 location being output folder location
         for keys in dictSampleSeqFiles.keys():
             check_dir(args.spadesFolder)
             check_dir(keys[1])
             terminal = []
+            
             #countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
-
             if (len(dictSampleSeqFiles[keys][0]) == 3):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + args.spadesFolder + " -m " + args.memory, ''))
+                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + keys[1] + " -m " + args.memory, ''))
             elif (len(dictSampleSeqFiles[keys][0]) == 2):
-                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--careful -t " + args.threads + " -o " + args.spadesFolder + " -m " + args.memory, ''))
+                terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2'], "--careful -t " + args.threads + " -o " + keys[1] + " -m " + args.memory, ''))
 
             print terminal[-1].getCommand()
             terminal[-1].runCmd("")
