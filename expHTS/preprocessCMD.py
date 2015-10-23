@@ -6,15 +6,17 @@ from parse_files import parseOut, bringTogether
 from bashSub import bashSub
 
 def checkPreprocessApplications():
-        applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
-
+        applications = ["super_deduper", "sickle", "flash2", "bowtie2", "scythe"]
+        source = ["https://github.com/dstreett/Super-Deduper", "https://github.com/dstreett/sickle", "https://github.com/dstreett/FLASH2", "http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.6/", "https://github.com/najoshi/scythe"]
+        i = 0;
         for app in applications:
                 if spawn.find_executable(app) is None:
                         sys.stderr.write("It doesn't look like you have app - " + app + "\n" )
+                        sys.stderr.write("You can download it here - " + source[i] + "\n");
                         exit(0)
                 else:
                         sys.stderr.write(app + " found\n")
-
+                i += 1
 
 
 def returnReads(dictSampleSeqFiles):
@@ -58,11 +60,12 @@ class preprocessCMD:
 
         def execute(self, args):
                 logFiles = []
+                time = 0
+
                 checkPreprocessApplications()
                 validate = validateApp()
                 validate.setValidation(True)
-                dictSampleSeqFiles = validate.validateSampleSheet(args.samplesDirectory, args.finalDir, args.samplesFile, args.force)
-                time = 0
+                dictSampleSeqFiles = validate.validateSampleSheet(args.samplesDirectory, args.finalDir, args.samplesFile, args.force, False)
 
                 for key in dictSampleSeqFiles:
                         check_dir(args.finalDir)
@@ -85,7 +88,9 @@ class preprocessCMD:
 
                                 mapper = bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null")
                                 cFilter = bashSub(extract_unmapped, mapper.processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))
-                                deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
+
+				if args.skipDup == False:
+                                	deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
 
                                 sickleArgs = " -o " + os.path.join(key[1], "SE_not_merged.fastq")  +  " -t sanger -l " + args.minLength
                                 if args.polyTrim:
@@ -110,7 +115,7 @@ class preprocessCMD:
 	                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
 
 
-                                sickleArgs = " -m stdout -s /dev/null -t sanger "
+                                sickleArgs = " -m stdout -s /dev/null -t sanger -T "
                                 if args.polyTrim:
                                         sickleArgs += " -a "
 
@@ -119,7 +124,7 @@ class preprocessCMD:
                                 #flash = bashSub("flash2", sickle.processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[-1] + " -d " + key[1] + " 2>" + os.path.join(meta, "flash_info.log"), os.path.join(meta, "flash_info.log"))
                                 #stats = bashSub("stats", flash.processSub(), [], '', os.path.join(meta, "stats.log"));
           			if args.skipFlash == False:
-		                      terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
+		                      terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
 
                                 terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
 
@@ -132,7 +137,7 @@ class preprocessCMD:
                                 time += terminalString[-1].returnTime()
                                 logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
 
-                bringTogether(logFiles, os.path.join(key[1].split("/")[0], "stats.log"))
+                bringTogether(logFiles, os.path.join(args.finalDir, "Preprocessing_Summary.log"))
                 print "Total amount of seconds to run all samples"
                 print "Seconds: " + str(time)
 
