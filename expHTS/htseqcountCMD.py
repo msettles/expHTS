@@ -7,15 +7,19 @@ from bashSub import bashSub
 
 
 def checkPreprocessApplications():
-    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
+    applications = ["samtools", "htseq-count"]
+    source = ["http://samtools.sourceforge.net/", "http://www-huber.embl.de/users/anders/HTSeq/doc/install.html"]
+    i = 0
 
     for app in applications:
         if spawn.find_executable(app) is None:
             sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            sys.stderr.write("Download it here - " + source[i] + "\n")
             exit(0)
         else:
             sys.stderr.write(app + " found\n")
 
+        i += 0
 
 def returnReads(dictSampleSeqFiles):
     SE = ""
@@ -61,6 +65,7 @@ class htseqCMD:
 
     def execute(self, args):
         time =  0
+        checkPreprocessApplications();
         logFiles = []
 
         # checkPreprocessApplications()

@@ -6,15 +6,17 @@ from parse_files import parseOut, bringTogether
 from bashSub import bashSub
 
 def checkPreprocessApplications():
-        applications = ["super_deduper", "sickle", "flash2"]
-
+        applications = ["super_deduper", "sickle", "flash2", "bowtie2", "scythe"]
+        source = ["https://github.com/dstreett/Super-Deduper", "https://github.com/dstreett/sickle", "https://github.com/dstreett/FLASH2", "http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.6/", "https://github.com/najoshi/scythe"]
+        i = 0;
         for app in applications:
                 if spawn.find_executable(app) is None:
                         sys.stderr.write("It doesn't look like you have app - " + app + "\n" )
+                        sys.stderr.write("You can download it here - " + source[i] + "\n");
                         exit(0)
                 else:
                         sys.stderr.write(app + " found\n")
-
+                i += 1
 
 
 def returnReads(dictSampleSeqFiles):

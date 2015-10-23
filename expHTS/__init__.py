@@ -6,7 +6,8 @@
 ##############################################################################
 
 #from expHTS_parser import parseArgs
-from expHTS import preprocessCMD, mappingCMD, htseqCMD, parseArgs
+#from expHTS import preprocessCMD, mappingCMD, htseqCMD, parseArgs
+import expHTS
 from samplesheet import sampleSheet
 #from preprocess import *
 
@@ -14,24 +15,15 @@ profile = False
 
 
 def main():
-    	"""
-    	Entry point for expHTS application
-   	"""
-    	preprocess = preprocessCMD()
-	mapping = mappingCMD()
-	htseq = htseqCMD()
+    expHTS.main()
 
-    	# Dictionary of subcommands, start with preprocess add more later
-    	commands = {'preprocess': preprocess, 'mapping':mapping, 'htseq': htseq}
-
-    	args = parseArgs()
-
-    	if profile:
-        	import cProfile
-        	cProfile.runctx('commands[args.command].execute(args)', globals(), locals())
-        	return 255
-    	else:
-        	commands[args.command].execute(args)
+    if profile:
+        #import cProfile
+        #cProfile.runctx('commands[args.command].execute(args)', globals(), locals())
+        return 255
+    else:
+        return 0;
+        #commands[args.command].execute(args)
 
 if __name__ == '__main__':
     main()
