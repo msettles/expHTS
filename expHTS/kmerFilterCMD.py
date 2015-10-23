@@ -7,15 +7,18 @@ from bashSub import bashSub
 
 
 def checkPreprocessApplications():
-    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
+    applications = ["kmer_filter"]
+    source = ["http://catchenlab.life.illinois.edu/stacks/"]
+    i = 0
 
     for app in applications:
         if spawn.find_executable(app) is None:
             sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            sys.stderr.write("You can download it here - " +  source[i] + "\n")
             exit(0)
         else:
             sys.stderr.write(app + " found\n")
-
+            i += 1
 
 def returnReads(dictSampleSeqFiles):
     SE = ""
@@ -62,6 +65,7 @@ class kmerFilterCMD:
 
     def execute(self, args):
         time =  0
+        checkPreprocessApplications();
         logFiles = []
 
         # checkPreprocessApplications()

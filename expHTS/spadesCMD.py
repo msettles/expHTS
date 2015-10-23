@@ -7,15 +7,17 @@ from bashSub import bashSub
 
 
 def checkPreprocessApplications():
-    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
-
+    applications = ["spades.py"]
+    source = ["http://bioinf.spbau.ru/spades"]
+    i = 0;
     for app in applications:
         if spawn.find_executable(app) is None:
             sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            sys.stderr.write("Download it here - " + source[i] + "\n");
             exit(0)
         else:
             sys.stderr.write(app + " found\n")
-
+            i += 0
 
 def returnReads(dictSampleSeqFiles):
     SE = ""
@@ -58,6 +60,7 @@ class spadesCMD:
 
     def execute(self, args):
         time =  0
+        checkPreprocessApplications();
         logFiles = []
 
         # checkPreprocessApplications()

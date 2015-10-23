@@ -7,21 +7,19 @@ from bashSub import bashSub
 
 
 
-
-
-
-
-
 def checkPreprocessApplications():
-    applications = ["./contaminant_screen.sh", "./extract_unmapped_reads.py", "super_deduper", "sickle", "flash2"]
+    applications = ["bwa", "samtools", "bowtie2"]
+    source = ["http://bio-bwa.sourceforge.net/", "http://samtools.sourceforge.net/", "http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.6/"]
+    i = 0
 
     for app in applications:
         if spawn.find_executable(app) is None:
             sys.stderr.write("It doesn't look like you have app - " + app + "\n")
+            sys.stderr.write("Download it here - " + source[i] + "\n")
             exit(0)
         else:
             sys.stderr.write(app + " found\n")
-
+        i+= 1
 
 def returnReads(dictSampleSeqFiles):
     SE = ""
@@ -87,6 +85,7 @@ class mappingCMD:
 
     def execute(self, args):
         time = 0
+        checkPreprocessApplications();
         logFiles = []
 
         # checkPreprocessApplications()
