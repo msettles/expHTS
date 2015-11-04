@@ -10,85 +10,82 @@ class validateApp:
         self.debug = True
         self.verbose = True
 
-    def validateSampleSheetHTSeq(self, dirSample, finalDir, sampleSheet, force):
+
+    def validateSampleSheet(self, dirSample, finalDir, sampleSheet, force, afterPreprocess, bamFiles):
+
         linenum = 0
+        
+        #Test to see if sample directory exists
         if not os.path.exists(dirSample):
             self.exitTime("Directory " + dirSample + " is not found")
+        #See if there is a sample sheet
         if os.path.exists(sampleSheet):
             f = open(sampleSheet, "r");
+        #Is there just nothing
         else:
             self.exitTime("No sample sheet named " + sampleSheet + " was found")
 
-        
+
+        #reads sample sheet
+        #there are 3 booleans that could be a bit confusing
+        #force will overwrite the current info in the directories
+        #preprocess is a special case - previous to preprocess the sampleID and seqID are different
+        #therefore we need to read in column 1 and column 2, after proprocess, we just need col 2
+        #htseq takes in back files, not fastq, so that has a special function
         for e in f.readlines():
             if linenum != 0:
-                self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force, True)
+                self.sampleSequenceID(dirSample, finalDir, e.split("\t"), force, afterPreprocess, bamFiles)
+
             linenum += 1
 
 
-        for key in self.sampleFiles:
-            self.sampleFiles[key].sort(key=lambda x: len(x))
         
-        return self.sampleFiles
-   
-    def validateSampleSheet(self, dirSample, finalDir, sampleSheet, force, afterPreprocess):
-        linenum = 0
-        if not os.path.exists(dirSample):
-            self.exitTime("Directory " + dirSample + " is not found")
-        if os.path.exists(sampleSheet):
-            f = open(sampleSheet, "r");
-        else:
-            self.exitTime("No sample sheet named " + sampleSheet + " was found")
-
-        for e in f.readlines():
-            if linenum != 0:
-                if afterPreprocess:
-                    self.sampleSequenceIDafterPreprocess(dirSample, finalDir, e.split("\t"), force, False)
-                else:
-                    self.sampleSequenceID(dirSample, finalDir, e.split("\t"), force)
-            linenum += 1
-
         for key in self.sampleFiles:
             self.sampleFiles[key].sort(key=lambda x: len(x))
+
         return self.sampleFiles
 
-    def sampleSequenceIDafterPreprocess(self, dirSample, finalDir, seqID, force, htseq):
+
+    #Gathers data form sample sheet
+    def sampleSequenceID(self, dirSample, finalDir, seqID, force, afterPreprocess, bamFiles):
+        
+        #comment, ignore line
         if seqID[0][0] == "#":
             pass
         elif len(seqID) >= 2:
-                        
-            seqID[0] = os.path.join(dirSample, seqID[1].rstrip()) 
-            seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
 
-            self.finalDirTest(seqID[1], force)
-            if htseq == False:
+            #as stated earlier, preprocess needs both columns
+            if (afterPreprocess == False):
+                seqID[0] = os.path.join(dirSample, seqID[0].rstrip()) 
+                seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
+                #Test samples
+                self.finalDirTest(seqID[1], force)
                 self.directoryFiles(seqID)
+            #after preprocess, only the second column is needed
             else:
-                self.directoryFilesHTSeq(seqID, seqID[1].split('/')[-1]);    
-        else:
-            self.exitTime("There wasn't two columns in the sample file file")
+                seqID[0] = os.path.join(dirSample, seqID[1].rstrip()) 
+                seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
+                self.finalDirTest(seqID[1], force)
 
-
-    def sampleSequenceID(self, dirSample, finalDir, seqID, force):
-        if seqID[0][0] == "#":
-            pass
-        elif len(seqID) >= 2:
-            
-            seqID[0] = os.path.join(dirSample, seqID[0])
-            seqID[1] = os.path.join(finalDir, seqID[1].rstrip())
-
-        
-            self.finalDirTest(seqID[1], force)
-            self.directoryFiles(seqID)
+                if bamFiles == False:
+                    #If fastq files are being looked for
+                    self.directoryFiles(seqID)
+                else:
+                    #Some applications will be looking for a bam file (such as htseq)
+                    self.directoryFilesBam(seqID, seqID[1].split('/')[-1]);    
         else:
             self.exitTime("There wasn't two columns in the sample file file")
 
 
 
+    
     def finalDirTest(self, sampleID, force):
+        #If there was data all ready there - just keep it and don't touch it unless force is set
         if os.path.exists(sampleID) and not force:
             self.exitTime(sampleID + " was all ready created. Use the -w or --overwrite option to overwrite")
         elif os.path.exists(sampleID):
+            #Just shoot a nice warning letting the user know there is no hope
+            #and that there data is now being overwritten
             print "Warning"
             print "Overwrite was turned on - overwriting " + sampleID + "\n"
             
@@ -96,21 +93,27 @@ class validateApp:
 
     #sets up the directory dictionary
     #set up key with tuple (sample and seq)
-    def directoryFilesHTSeq(self, sampleSeq, fileName):
+    def directoryFilesBam(self, sampleSeq, fileName):
         sampleSeq = tuple(sampleSeq)
         #print sampleSeq
         directoryTest = sampleSeq[0].rstrip();
         #fastqCount insures at least one fastq files is under the directory
         bamCount = 0
+
+
+        #Going down the directory
         if self.testDirectory(directoryTest):
             for subdir, dir, files in os.walk(directoryTest):
                 for file in files:
                     file = os.path.abspath(os.path.join(directoryTest, file))
+                    #checks for bam format
                     if ".bam" in file and fileName in file and not ".bai" in file:
                         bamCount += 1
+                        #see if the array has been initialized yet
                         if not sampleSeq in self.sampleFiles:
                             self.sampleFiles[sampleSeq] = []
                         
+                        #adds to the dictionary (no file should be named the same so this is okay)
                         self.sampleFiles[sampleSeq].append(file)
 
             if (bamCount == 0):
@@ -122,6 +125,10 @@ class validateApp:
 
 
 
+    #THIS WILL NEED TO BE CHANGED
+    #Currently, we are just using the Casava(?) Format that dictates *_R1.fastq and *_R2.fastq
+    #A future enhancement where each file is checked and queued to ensure Pairs, SE, and Interleaved
+    #are all account for.
     def directoryFiles(self, sampleSeq):
         sampleSeq = tuple(sampleSeq)
         #print sampleSeq
@@ -132,8 +139,13 @@ class validateApp:
             for subdir, dir, files in os.walk(directoryTest):
                 for file in files:
                     file = os.path.abspath(os.path.join(directoryTest, file))
+
+                    #Yes, this is only checking for fastq(.gz) files that have _R1 in them
+                    #Previous to preprocess, _R1 alone will be a SE read
                     if "_R1" in file and ".fastq" in file:
                         fastqCount += 1
+
+                        #starts an empty array with the sample sheet
                         if not sampleSeq in self.sampleFiles:
                             self.sampleFiles[sampleSeq] = []
                         
@@ -194,8 +206,4 @@ class validateApp:
     def dictionaryFilesReturn(self):
         return self.sampleFiles
 
-def main():
-    test = validateApp(False)
-    test.validateSampleSheet("samples.txt")
-    test.infoOutput()
 

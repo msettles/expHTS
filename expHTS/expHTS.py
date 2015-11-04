@@ -69,8 +69,8 @@ def mappingParser(subparser):
     mapping_parser.add_argument('-R', "--reference", help='Reference fasta to map against', action='store', type=str, dest='refFasta', metavar='REFERENCE', default='')
     mapping_parser.add_argument('-i', '--force-index', help='overwrites old index files [default: %(default)s]', action='store_true', dest='forceIndex', default=False)
     mapping_parser.add_argument('-M', "--mappingAlgorithm", help='Mapping algorithm bwa or bowtie2 [default: %(default)s]', action='store', type=str, dest='mapping', metavar='ALGORITHM', default='bwa')
-    mapping_parser.add_argument('-n', "--sortByReadID", help="When sorting bam files, sort by read ID (samtools -n option), for compatability with htseq-count [default: %(default)s]", action='store_true', dest='sortByReadID', default=False)
-    mapping_parser.add_argument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatability with htseq-count [default: %(default)s]", action='store_true', dest="ignoreSingles", default=False)
+    mapping_parser.add_argument('-n', "--sortByReadID", help="When sorting bam files, sort by read ID (samtools -n option), for compatibility with htseq-count [default: %(default)s]", action='store_true', dest='sortByReadID', default=False)
+    mapping_parser.add_argument('-s', "--ignoreSingles", help="Ignore any single-end files, for compatibility with htseq-count [default: %(default)s]", action='store_true', dest="ignoreSingles", default=False)
     mapping_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default: %(default)s]', action='store', type=str, default="03-BWA", dest="finalDir", metavar='DIRECTORY')
     mapping_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default: %(default)s]', action='store_true', dest='force', default=False)
     mapping_parser.add_argument('-S', '--forcePairs', help='Force pairs [default: %(default)s]', action='store_true', dest='forcePairs', default=False)
@@ -101,13 +101,13 @@ def preprocessParser(subparser):
 def spadesParser(subparser):
 
     spades_parser = subparser.add_parser('spades', help='runs spades assembler')
-    spades_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default samples.txt]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
-    spades_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [default 02-Cleaned]', action='store', dest='readFolder', default="02-Cleaned")
-    spades_parser.add_argument('-n', '--spadesFolder', help='Directory where Spades output will be stored [defualt 03-Spades]', action='store', type=str, dest="spadesFolder", metavar='DIRECTORY', default='03-Spades')
-    spades_parser.add_argument('-p', '--processors', help='Number of processors to be used by Spades [default 10]', action='store', type=str, dest="threads", metavar="PROCESSORS", default="10")
-    spades_parser.add_argument('-e', '--error-correction', help='Perform error correction prior to assembly [default FALSE]', action='store_true', dest="errorCorrection", default=False)
-    spades_parser.add_argument('-l', '--large_contigs_size', help='Size of contig considered "large" contigs [default 500]', action='store', type=str, dest="largeContigs", metavar="LARGE_CONTIG")
-    spades_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default FALSE]', action='store_true', dest='force', default=False)
+    spades_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default: $(default)s]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
+    spades_parser.add_argument('-r', '--readFolder', help='Directory where the sequence data is stored [default: $(default)s]', action='store', dest='readFolder', default="02-Cleaned")
+    spades_parser.add_argument('-n', '--spadesFolder', help='Directory where Spades output will be stored [default: $(default)s]', action='store', type=str, dest="spadesFolder", metavar='DIRECTORY', default='03-Spades')
+    spades_parser.add_argument('-p', '--processors', help='Number of processors to be used by Spades [default: $(defaults)]', action='store', type=str, dest="threads", metavar="PROCESSORS", default="10")
+    spades_parser.add_argument('-e', '--error-correction', help='Perform error correction prior to assembly [default: $(default)s]', action='store_true', dest="errorCorrection", default=False)
+    spades_parser.add_argument('-l', '--large_contigs_size', help='Size of contig considered "large" contigs [default: $(default)s]', action='store', type=str, dest="largeContigs", metavar="LARGE_CONTIG")
+    spades_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default: $(default)s]', action='store_true', dest='force', default=False)
     spades_parser.add_argument('-m', '--memory', help='RAM limit for spades  [default: %(default)s]', action='store', type=str, dest="memory", metavar="RAM", default="250")
     
     return spades_parser
@@ -135,7 +135,7 @@ def kmerParser(subparser):
     return kmer_parser
 
 def parseArgs():
-    revision_date = "Oct212015"
+    revision_date = "Nov012015"
     parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
     parser.add_argument("--version", action="version", version="expHTS Version v" + version_num + "." + revision_date )
     subparsers = parser.add_subparsers(help='commands', dest='command')
@@ -160,6 +160,7 @@ def main():
     spades = spadesCMD()
     forcepairs = forcepairCMD()
     kmernorm = kmerFilterCMD()
+
     commands = {'preprocess': preprocess, 'mapping': mapping, 'htseq': htseq, "spades": spades, "forcepairs": forcepairs, 'kmernorm': kmernorm}
 
     args = parseArgs()

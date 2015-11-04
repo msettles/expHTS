@@ -91,7 +91,10 @@ class mappingCMD:
         # checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
-        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, True)
+
+        afterPreprocess = True;
+        bamFiles = False;
+        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, afterPreprocess, bamFiles)
 
         self.index(args.refFasta, args.mapping, args.forceIndex)
 

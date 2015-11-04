@@ -71,7 +71,11 @@ class htseqCMD:
         # checkPreprocessApplications()
         validate = validateApp()
         validate.setValidation(True)
-        dictSampleSeqFiles = validate.validateSampleSheetHTSeq(args.readFolder, args.finalDir, args.samplesFile, args.force)
+
+        afterPreprocess = True;
+        bamFiles = True;
+
+        dictSampleSeqFiles = validate.validateSampleSheet(args.readFolder, args.finalDir, args.samplesFile, args.force, afterPreprocess, bamFiles)
 
         self.index(args.refGTF)
 
