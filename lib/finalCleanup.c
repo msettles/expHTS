@@ -49,9 +49,9 @@ struct stats {
         unsigned long long int polyTTrimmed;
 
 
-        unsigned long int R1_length[700];
-        unsigned long int R2_length[700];
-        unsigned long int SE_length[700];
+        unsigned int R1_length[700];
+        unsigned int R2_length[700];
+        unsigned int SE_length[700];
 
 };
 
@@ -339,7 +339,6 @@ int PolyATTrim = 0;
 
 int grabTab(FILE *f, struct reads *r, struct stats *s) {
         char data[4096];
-        int i = 0;
 
         if (fgets(data, sizeof(data), f) != NULL) {
                 split(data, "\t", r);
@@ -570,7 +569,8 @@ static PyObject *
 	int polyAT = 0, split = 0;
 	
 	if (!PyArg_ParseTuple(args, "iiis#s#s#s#s#", &polyAT, &split, &minLen, &logFile, &logFileSize, &devFile, &devFileSize, &R1, &r1_size, &R2, &r2_size, &SE, &se_size)) {
-		return NULL;		
+		exit(2);
+		//return NULL;		
 	}
 	split = 0;
 	clean(devFile, logFile, R1, R2, SE, split, polyAT);
@@ -600,7 +600,7 @@ initfinalCleanup(void)
 
     if (m == NULL) {
 	printf("Null value in init\n");
-	return NULL;
+	exit(2);
     }
 
     PyModule_AddStringConstant(m, "__version__", FINALCLEANUP_VERSION);
