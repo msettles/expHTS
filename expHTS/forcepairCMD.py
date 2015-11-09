@@ -17,33 +17,6 @@ def checkPreprocessApplications():
             sys.stderr.write(app + " found\n")
 
 
-def returnReads(dictSampleSeqFiles):
-    SE = ""
-    PE1 = ""
-    PE2 = ""
-
-    # data struct
-    # { (sampleKey, seqKey) : [[SE], [SE], [PE1, PE2], [PE1, PE2]] }
-    # diving into each of the sub lists in the dictionary value key
-    for e in dictSampleSeqFiles:
-        # if sublist only has one elment then it is SE read
-        if len(e) == 1:
-            if SE == "":
-                SE = e[0]
-            else:
-                SE += "," + e[0]
-
-        else:
-            if PE1 == "":
-                PE1 = e[0]
-                PE2 = e[1]
-            else:
-                PE1 += "," + e[0]
-                PE2 += "," + e[1]
-
-    return [SE, PE1, PE2]
-
-
 def check_dir(Dir):
 
     if not os.path.exists(Dir):
@@ -115,6 +88,7 @@ class forcepairCMD:
                 print terminal[-1].getCommand()
                 terminal[-1].runCmd("")
                 sys.stderr.flush()
+
         time += terminal[-1].returnTime()
 
         #logFiles.append(parseOutHTseq(keys[1], keys[1].split("/")[-1]))
