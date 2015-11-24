@@ -600,7 +600,7 @@ initfinalCleanup(void)
 
     if (m == NULL) {
 	printf("Null value in init\n");
-	return NULL;
+	//return NULL;
     }
 
     PyModule_AddStringConstant(m, "__version__", FINALCLEANUP_VERSION);
