@@ -104,7 +104,7 @@ class mappingCMD:
             endString = ' 2>/dev/null | tee >(samtools flagstat - >' + os.path.join(key[1], fileEnding + '.flagstats') + ') | samtools view -bS - | samtools sort - ' + os.path.join(key[1], fileEnding)
             SEandPE = returnReads(dictSampleSeqFiles[key])
             files = dictSampleSeqFiles[key][0]
-            RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
+            RGstring = "-R '@RG\\tID:" + fileEnding + "\\tSM:" + fileEnding + "\\tPL:ILLUMINA\\tLB:whatever\\tPU:whatever\\tDS:Paired'"
 
             if SEandPE[0] != "":
                 terminalString = []
@@ -155,7 +155,7 @@ class mappingCMD:
                 runIdxStats=bashSub("samtools idxstats ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '> ' + os.path.join(key[1], fileEnding + ".idxstats"), '/dev/null')
 
             elif SEandPE[1] != "":
-                RGstring = "-R '@RG\tID:" + fileEnding + "\tSM:" + fileEnding + "\tPL:ILLUMINA\tLB:whatever\tPU:whatever\tDS:Paired'"
+                RGstring = "-R '@RG\\tID:" + fileEnding + "\\tSM:" + fileEnding + "\\tPL:ILLUMINA\\tLB:whatever\\tPU:whatever\\tDS:Paired'"
                 terminalString = []
                 terminalString.append(bashSub("bwa mem -M " + RGstring, [args.threads], ['-t'], args.refFasta + " " + SEandPE[1] + " " + SEandPE[2] + endString, "/dev/null"))
                 runIndex = bashSub("samtools index ",  [os.path.join(key[1], fileEnding + ".bam")], [''], '', '/dev/null')
