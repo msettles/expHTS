@@ -170,7 +170,6 @@ void split(char *strTest, char *delimiter, struct reads *r) {
         char *token;
         int count = 0;
         int i = 0;
-
         while ((token = strsep(&strTest, delimiter)) != NULL) {
                 results[count] = strdup(token);
                 count++;
@@ -194,7 +193,6 @@ void split(char *strTest, char *delimiter, struct reads *r) {
                 (r->r1).r_qual = strdup(results[2]);
                 (r->r1).r_len = strlen((r->r1).r_seq);
                 (r->r2).r_header = NULL;
-
         }
 
 
@@ -237,7 +235,7 @@ void getStats(struct reads *r, struct stats *s) {
         } else if ((r->r1).r_len < minLen) {
                 (s->r1_discarded)++;
                 (r->r1).r_header = NULL;
-		        (r->r2).r_header = NULL;
+                (r->r2).r_header = NULL;
                 return;
         }
 
@@ -261,7 +259,7 @@ void getStats(struct reads *r, struct stats *s) {
                 } else {
                     ((s->SE_length)[(r->r1).r_len])++;
                 }
-	    }
+        }
 
         if ((r->r2).r_header != NULL) {
                 if ((r->r2).r_len == -1) {
@@ -273,7 +271,7 @@ void getStats(struct reads *r, struct stats *s) {
                 } else {
                     ((s->SE_length)[(r->r2).r_len])++;
                 }
-	    }
+        }
 
 }
 
@@ -282,9 +280,9 @@ void getStats(struct reads *r, struct stats *s) {
 void PolyATCuts(struct reads *r, int minLenOfTail, int errorsAllowed, struct stats *s) {
         int cut = trim_poly_t((r->r1).r_seq, minLenOfTail, errorsAllowed, 0, (r->r1).r_len);
 
-	if ((r->r1).r_header == NULL) {
-		printf("oh shoot!\n");
-	}
+    if ((r->r1).r_header == NULL) {
+        printf("oh shoot!\n");
+    }
 
         if (cut != 0) {
                 s->polyTTrimmed += 1;
@@ -293,8 +291,8 @@ void PolyATCuts(struct reads *r, int minLenOfTail, int errorsAllowed, struct sta
                 (r->r1).r_len -= cut;
                 //Magic number for sure but if it gets close to the end - poly T can only be R2 if it spans R1
                 if ((r->r1).r_len < 5 && (r->r2).r_header != NULL) {
-			(r->r1) = (r->r2);
-			(r->r2).r_header = NULL;
+            (r->r1) = (r->r2);
+            (r->r2).r_header = NULL;
                         cut = trim_poly_t((r->r1).r_seq, minLenOfTail, errorsAllowed, 0, (r->r1).r_len);
                         if (cut != 0) {
                                 s->polyTTrimmed += cut;
@@ -306,31 +304,31 @@ void PolyATCuts(struct reads *r, int minLenOfTail, int errorsAllowed, struct sta
 
         }
 
-	if ((r->r2).r_header != NULL) {
-	        cut = trim_poly_a((r->r2).r_seq, minLenOfTail, errorsAllowed, (r->r2).r_len, 0);
-        	if (cut != 0) {
+    if ((r->r2).r_header != NULL) {
+            cut = trim_poly_a((r->r2).r_seq, minLenOfTail, errorsAllowed, (r->r2).r_len, 0);
+            if (cut != 0) {
 
-                	s->polyATrimmed += 1;
-	                (r->r2).r_seq[(r->r2).r_len - cut + 1] = '\0';
-			(r->r2).r_qual[(r->r2).r_len - cut + 1] = '\n';
+                    s->polyATrimmed += 1;
+                    (r->r2).r_seq[(r->r2).r_len - cut + 1] = '\0';
+            (r->r2).r_qual[(r->r2).r_len - cut + 1] = '\n';
 
-	                (r->r2).r_seq[(r->r2).r_len - cut + 2] = '\0';
-			(r->r2).r_qual[(r->r2).r_len - cut + 2] = '\0';
-			(r->r2).r_len -= cut;
+                    (r->r2).r_seq[(r->r2).r_len - cut + 2] = '\0';
+            (r->r2).r_qual[(r->r2).r_len - cut + 2] = '\0';
+            (r->r2).r_len -= cut;
 
-			if ((r->r2).r_len < 5) {
-				(r->r2).r_header = NULL;
-				cut = trim_poly_a((r->r1).r_seq, minLenOfTail, errorsAllowed, (r->r1).r_len, 0);
+            if ((r->r2).r_len < 5) {
+                (r->r2).r_header = NULL;
+                cut = trim_poly_a((r->r1).r_seq, minLenOfTail, errorsAllowed, (r->r1).r_len, 0);
 
-				if (cut != 0) {
-					s->polyATrimmed += cut;
-					(r->r1).r_seq[(r->r1).r_len - cut + 1] = '\0';
-					(r->r1).r_seq[(r->r1).r_len - cut + 1] = '\0';
-					(r->r1).r_len -= cut;
-                       		}
-                	}
-        	}
-	}
+                if (cut != 0) {
+                    s->polyATrimmed += cut;
+                    (r->r1).r_seq[(r->r1).r_len - cut + 1] = '\0';
+                    (r->r1).r_seq[(r->r1).r_len - cut + 1] = '\0';
+                    (r->r1).r_len -= cut;
+                               }
+                    }
+            }
+    }
 
 }
 
@@ -343,14 +341,15 @@ int grabTab(FILE *f, struct reads *r, struct stats *s) {
 
         if (fgets(data, sizeof(data), f) != NULL) {
                 split(data, "\t", r);
-		if (PolyATTrim) {
-                	PolyATCuts(r, 10, 3, s);
+        
+                if (PolyATTrim) {
+                    PolyATCuts(r, 10, 3, s);
                 }
-		if ((r->r1).r_header != NULL) {
-			getStats(r, s);
-		}
+                if ((r->r1).r_header != NULL) {
+                    getStats(r, s);
+                }
 
-	        return 1;
+            return 1;
         } else {
                 return 0;
         }
@@ -384,7 +383,7 @@ char * reverseComp(char *read) {
         int i = 0, end = strlen(read)-1;
 
         while (strReverse[i] != '\n' &&  strReverse[i] != '\0' && strReverse[i] != '\t') {
-		strReverse[i] = compliment(read[end]);
+        strReverse[i] = compliment(read[end]);
                 i++;
                 end--;
         }
@@ -405,10 +404,10 @@ char *reverse(char *read) {
                 end--;
         }
 
-	if (strReverse[i] !=  '\n') {
-		strReverse[i] = '\n';
-	}
-	strReverse[++i] = '\0';
+    if (strReverse[i] !=  '\n') {
+        strReverse[i] = '\n';
+    }
+    strReverse[++i] = '\0';
 
         return strReverse;
 
@@ -425,132 +424,116 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         FILE *R1 = NULL;
         FILE *R2 = NULL;
         FILE *SE = NULL;
-	FILE *log = NULL;
+        FILE *log = NULL;
 
         struct reads r;
         struct stats s;
         int sum = 0, R1_len = 0, R2_len = 0, SE_len = 0;
 
         statsConstruct(&s);
-	PolyATTrim = tmpPolyATTrim;
+        PolyATTrim = tmpPolyATTrim;
 
         while (grabTab(f, &r, &s)) {
 
-                if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
-                        s.pe_kept++;
-			
-			if (R1 == NULL) {
-        			R1 = fopen(strR1, "w");
-			}		
-			if (R2 == NULL) {
-        			R2 = fopen(strR2, "w");
-			}
+            if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
+                s.pe_kept++;
+            
+                if (R1 == NULL) {
+                    R1 = fopen(strR1, "a");
+                }        
+                if (R2 == NULL) {
+                    R2 = fopen(strR2, "a");
+                }
 
-			if ((r.r1).r_header[0] == '@') {
+                if ((r.r1).r_header[0] == '@') {
 
-				if ((r.r1).r_header[strlen((r.r1).r_header)-1] == '1') {
-					fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-					(r.r2).r_header[strlen((r.r2).r_header)-1] = '2';
-					fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-				} else {
-					fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-					fprintf(R2, "%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-				}
+                    if ((r.r1).r_header[strlen((r.r1).r_header)-1] == '1') {
+                        fprintf(R1, "%s\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                        (r.r2).r_header[strlen((r.r2).r_header)-1] = '2';
+                        fprintf(R2, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                    } else {
+                        fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                        fprintf(R2, "%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                    }
 
-                	} else {
-				fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-			}
+                    } else {
+                        fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                        fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
+                    }
 
 
-		} else if (forcePairs && (r.r1).r_header != NULL) {
-                        s.numForcedPairs++;
-                        int loc = (strlen((r.r1).r_seq))/2;
-                        char cSeq = (r.r1).r_seq[loc];
-                        char cQual = (r.r1).r_qual[loc];
+            } else if (forcePairs && (r.r1).r_header != NULL) {
+                s.numForcedPairs++;
+                int loc = (strlen((r.r1).r_seq))/2;
+                char cSeq = (r.r1).r_seq[loc];
+                char cQual = (r.r1).r_qual[loc];
 
-			if (R1 == NULL) {
-        			R1 = fopen(strR1, "w");
-			}		
-			if (R2 == NULL) {
-        			R2 = fopen(strR2, "w");
-			}
+                if (R1 == NULL) {
+                    R1 = fopen(strR1, "a");
+                }        
+                if (R2 == NULL) {
+                    R2 = fopen(strR2, "a");
+                }
 
-			if ((r.r1).r_header[0] == '@') {
-				(r.r1).r_seq[loc] = '\0';
-				(r.r1).r_qual[loc] = '\0';
-				fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				(r.r1).r_seq[loc] = cSeq;
-				(r.r1).r_qual[loc] = cQual;
-				fprintf(R2, "%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
-			} else {
-				(r.r1).r_seq[loc] = '\0';
-				(r.r1).r_qual[loc] = '\0';
-				fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-				(r.r1).r_seq[loc] = cSeq;
-				(r.r1).r_qual[loc] = cQual;
-				fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
-			}			
-                } else if ((r.r2).r_header != NULL) {
-			if (SE == NULL) {
-                		SE = fopen(strSE, "w");
-			}
-                        s.se_kept++;
+                if ((r.r1).r_header[0] == '@') {
+                    (r.r1).r_seq[loc] = '\0';
+                    (r.r1).r_qual[loc] = '\0';
+                    fprintf(R1, "%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                    (r.r1).r_seq[loc] = cSeq;
+                    (r.r1).r_qual[loc] = cQual;
+                    fprintf(R2, "%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+                } else {
+                    (r.r1).r_seq[loc] = '\0';
+                    (r.r1).r_qual[loc] = '\0';
+                    fprintf(R1, "@%s/1\n%s\n+\n%s\n", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                    (r.r1).r_seq[loc] = cSeq;
+                    (r.r1).r_qual[loc] = cQual;
+                    fprintf(R2, "@%s/2\n%s\n+\n%s", (r.r1).r_header, reverseComp(&((r.r1).r_seq)[loc]), reverse(&((r.r1).r_qual)[loc]));
+                }            
+            } else if ((r.r1).r_header != NULL) {
+                if (SE == NULL) {
+                    SE = fopen(strSE, "a");
+                }
+                s.se_kept++;
+                if ((r.r1).r_header[0] == '@') {
+                    fprintf(SE, "%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                } else {
+                     fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
+                }
 
-			if ((r.r2).r_header[0] == '@') {
-                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-                        } else {
-				fprintf(SE, "@%s\n%s\n+\n%s", (r.r2).r_header, (r.r2).r_seq, (r.r2).r_qual);
-			}
+                if ((r.r1).r_qual[strlen((r.r1).r_qual)-1] != '\n') {
+                    fprintf(SE, "\n");
+                }
 
-			if ((r.r2).r_qual[strlen((r.r2).r_qual)-1] != '\n') {
-				fprintf(SE, "\n");
-			}
-
-                } else if ((r.r1).r_header != NULL) {
-			if (SE == NULL) {
-                		SE = fopen(strSE, "w");
-			}
-                        s.se_kept++;
-			if ((r.r1).r_header[0] == '@') {
-                        	fprintf(SE, "%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-                	} else {
-                        	fprintf(SE, "@%s\n%s\n+\n%s", (r.r1).r_header, (r.r1).r_seq, (r.r1).r_qual);
-			}
-
-			if ((r.r1).r_qual[strlen((r.r1).r_qual)-1] != '\n') {
-				fprintf(SE, "\n");
-			}
-
-		}
+            }
 
         }
 
-	if (log == NULL) {
-		log = fopen(logFile, "w");
-	}
+        if (log == NULL) {
+            log = fopen(logFile, "a");
+        }
 
-    for (sum = 0; sum < 700; sum++) {
-        R1_len += (s.R1_length[sum] * sum);
-        R2_len += (s.R2_length[sum] * sum);
-        SE_len += (s.SE_length[sum] * sum);
-    }
+        for (sum = 0; sum < 700; sum++) {
+            R1_len += (s.R1_length[sum] * sum);
+            R2_len += (s.R2_length[sum] * sum);
+            SE_len += (s.SE_length[sum] * sum);
+        }
 
         fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tR1_Ave_Len\tR2_Ave_Len\tSE_Ave_Len\tAverageQual\n");
         fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
         //fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\tR1_Len\tR2_Len\n");
         //fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
-		R1_len/(s.pe_kept), R2_len/(s.pe_kept), SE_len/(s.se_kept), (float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
+        R1_len/(s.pe_kept), R2_len/(s.pe_kept), SE_len/(s.se_kept), (float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
 
           
-	if (f != NULL) {
-        	fclose(f);
+    if (f != NULL) {
+            fclose(f);
         }
 
-	if (R1 != NULL) {
-		fclose(R1);
-        	fclose(R2);
-	}
+    if (R1 != NULL) {
+        fclose(R1);
+            fclose(R2);
+    }
 
 
         if (SE != NULL) {
@@ -564,17 +547,17 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
    
 
 static PyObject *
-	finalCleanup(PyObject *self, PyObject *args) {
-	const char *logFile, *devFile, *R1, *R2, *SE;
-	int logFileSize, devFileSize, r1_size, r2_size, se_size;
-	int polyAT = 0, split = 0;
-	
-	if (!PyArg_ParseTuple(args, "iiis#s#s#s#s#", &polyAT, &split, &minLen, &logFile, &logFileSize, &devFile, &devFileSize, &R1, &r1_size, &R2, &r2_size, &SE, &se_size)) {
-		return NULL;		
-	}
-	split = 0;
-	clean(devFile, logFile, R1, R2, SE, split, polyAT);
-	return args;
+    finalCleanup(PyObject *self, PyObject *args) {
+    const char *logFile, *devFile, *R1, *R2, *SE;
+    int logFileSize, devFileSize, r1_size, r2_size, se_size;
+    int polyAT = 0, split = 0;
+    
+    if (!PyArg_ParseTuple(args, "iiis#s#s#s#s#", &polyAT, &split, &minLen, &logFile, &logFileSize, &devFile, &devFileSize, &R1, &r1_size, &R2, &r2_size, &SE, &se_size)) {
+        return NULL;        
+    }
+    split = 0;
+    clean(devFile, logFile, R1, R2, SE, split, polyAT);
+    return args;
 }
 
 
@@ -599,8 +582,8 @@ initfinalCleanup(void)
     m = Py_InitModule3("finalCleanup", finalCleanup_methods, module_doc);
 
     if (m == NULL) {
-	printf("Null value in init\n");
-	//return NULL;
+    printf("Null value in init\n");
+    //return NULL;
     }
 
     PyModule_AddStringConstant(m, "__version__", FINALCLEANUP_VERSION);

@@ -89,9 +89,15 @@ class validateApp:
         if os.path.exists(sampleID) and not force:
             self.exitTime(sampleID + " was all ready created. Use the -w or --overwrite option to overwrite")
         elif os.path.exists(sampleID):
+            for root, dirs, files in os.walk(sampleID, topdown=False):
+                for f in files:
+                    os.remove(os.path.join(root, f))
+                for d in dirs:
+                    os.rmdir(os.path.join(root, d))
+                    
             print "Warning"
             print "Overwrite was turned on - overwriting " + sampleID + "\n"
-            
+             
             
 
     #sets up the directory dictionary

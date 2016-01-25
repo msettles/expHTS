@@ -81,38 +81,39 @@ class preprocessCMD:
 
 
                         if SEandPE[0] != "":
-				terminalString = []
+                                terminalString = []
                                 if args.contaminateFolder != "":
                                         contArgsBaseline = "-c " + args.contaminateFolder + contArgsBaseline
 
 
-                                mapper = bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null")
-                                cFilter = bashSub(extract_unmapped, mapper.processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))
+                                terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null"))
+                                terminalString.append((bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))))
 
-				if args.skipDup == False:
-                                	deduper = bashSub("super_deduper", cFilter.processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log"))
+                                if args.skipDup == False:
+                                    terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log")))
 
-                                sickleArgs = " -o " + os.path.join(key[1], "SE_not_merged.fastq")  +  " -t sanger -l " + args.minLength
+                                sickleArgs = " -o stdout -T -t sanger -l " + args.minLength
                                 if args.polyTrim:
                                         sickleArgs += " -a "
 
-                                scythe = bashSub("scythe",  [args.adapter], ["-a"], deduper.processSub()[0] + " -q sanger", os.path.join(meta, "SE_scythe_info.log"))
-                                sickle =  bashSub("sickle se", scythe.processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log"))
+                                terminalString.append(bashSub("scythe",  [args.adapter], ["-a"], terminalString[-1].processSub()[0] + " -q sanger", os.path.join(meta, "SE_scythe_info.log")))
+                                terminalString.append(bashSub("sickle se", terminalString[-1].processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log")))
+                                terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
 
                                 print "___ SE COMMANDS ____"
-                                print sickle.getCommand()
-                                sickle.runCmd("")
-                                time += sickle.returnTime()
+                                print terminalString[-1].getCommand()
+                                terminalString[-1].runCmd("")
+                                time += terminalString[-1].returnTime()
                         if SEandPE[1] != "":
-				terminalString = []
+                                terminalString = []
                                 if args.contaminateFolder != "":
                                         contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
 
                                 terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
                                 terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
-	
-				if args.skipDup == False:
-	                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
+    
+                                if args.skipDup == False:
+                                    terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
 
 
                                 sickleArgs = " -m stdout -s /dev/null -t sanger -T "
@@ -123,8 +124,8 @@ class preprocessCMD:
 
                                 #flash = bashSub("flash2", sickle.processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[-1] + " -d " + key[1] + " 2>" + os.path.join(meta, "flash_info.log"), os.path.join(meta, "flash_info.log"))
                                 #stats = bashSub("stats", flash.processSub(), [], '', os.path.join(meta, "stats.log"));
-          			if args.skipFlash == False:
-		                      terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
+                                if args.skipFlash == False:
+                                    terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
 
                                 terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
 
