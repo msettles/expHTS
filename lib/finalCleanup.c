@@ -436,8 +436,8 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
 
         while (grabTab(f, &r, &s)) {
 
-                if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
-                        s.pe_kept++;
+            if ((r.r2).r_header != NULL && (r.r1).r_header != NULL) {
+                s.pe_kept++;
 			
 			if (R1 == NULL) {
         			R1 = fopen(strR1, "w");
