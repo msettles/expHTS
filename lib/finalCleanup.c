@@ -337,7 +337,6 @@ int PolyATTrim = 0;
 
 int grabTab(FILE *f, struct reads *r, struct stats *s) {
         char data[4096];
-        int i = 0;
 
         if (fgets(data, sizeof(data), f) != NULL) {
                 split(data, "\t", r);
@@ -416,7 +415,7 @@ char *reverse(char *read) {
 
 
 
-int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, int tmpforcePairs, int tmpPolyATTrim) {
+int clean(const char *devFile, const char *logFile, const char *strR1, const char *strR2, const char *strSE, int tmpforcePairs, int tmpPolyATTrim) {
         int forcePairs = tmpforcePairs;
 
         FILE *f = fopen(devFile, "r");
@@ -520,10 +519,10 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         }
 
         fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tR1_Ave_Len\tR2_Ave_Len\tSE_Ave_Len\tAverageQual\n");
-        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%d\t%d\t%d\t%.2f\t%.2f\t%.2f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
-        //fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tAverageQual\tR1_Len\tR2_Len\n");
-        //fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.0f\t%.0f\n", s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
-        R1_len/(s.pe_kept), R2_len/(s.pe_kept), SE_len/(s.se_kept), (float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
+        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t\
+                %.2f\t%.2f\t%.2f\t%.2f\n", 
+                s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
+        (float)R1_len/(float)(s.pe_kept), (float)R2_len/(float)(s.pe_kept), (float)SE_len/(float)(s.se_kept), (float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
 
           
     if (f != NULL) {
@@ -543,6 +542,8 @@ int clean(char *devFile, char *logFile, char *strR1, char *strR2, char *strSE, i
         if (log != NULL) {
             fclose(log);
         }
+        return 1;
+
 }
    
 
@@ -553,7 +554,7 @@ static PyObject *
     int polyAT = 0, split = 0;
     
     if (!PyArg_ParseTuple(args, "iiis#s#s#s#s#", &polyAT, &split, &minLen, &logFile, &logFileSize, &devFile, &devFileSize, &R1, &r1_size, &R2, &r2_size, &SE, &se_size)) {
-        return NULL;        
+        exit(2);
     }
     split = 0;
     clean(devFile, logFile, R1, R2, SE, split, polyAT);
@@ -582,7 +583,8 @@ initfinalCleanup(void)
     m = Py_InitModule3("finalCleanup", finalCleanup_methods, module_doc);
 
     if (m == NULL) {
-    printf("Null value in init\n");
+        printf("Null value in init\n");
+        exit(2);
     //return NULL;
     }
 
