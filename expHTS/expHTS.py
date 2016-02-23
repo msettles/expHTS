@@ -8,7 +8,7 @@ from htseqcountCMD import htseqCMD
 from spadesCMD import spadesCMD
 from forcepairCMD import forcepairCMD
 from kmerFilterCMD import kmerFilterCMD
-version_num = "0.1"
+version_num = "1.0"
 """
 Preprocessing of fastq sequence files for a single sample,
 in either paired format or single end format and potentially both
@@ -48,7 +48,7 @@ def signal_handler(signal, frame):
 def htseqParser(subparser):
     htseq_parser = subparser.add_parser('htseq', help='runs htseq-count on mapped (bam) files')
     htseq_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default: %(default)s]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
-    htseq_parser.add_argument('-r', '--bamFolder', help='Directory where the sequence data is stored [default: %(defaults)s]', action='store', type=str, dest='readFolder', metavar='FOLDER', default='03-BWA')
+    htseq_parser.add_argument('-r', '--bamFolder', help='Directory where the sequence data is stored [default: %(default)s]', action='store', type=str, dest='readFolder', metavar='FOLDER', default='03-BWA')
     htseq_parser.add_argument('-R', "--referenceGTF", help='Reference gtf to count against', action='store', type=str, dest='refGTF', metavar='REFERENCE GFT', default='')
     # htseq_parser.add_argument('-o', "--order", help='pos or name - [default name]', action='store', type=str, dest='order', metavar='ORDER', default='name');
     htseq_parser.add_argument('-s', "--stranded", help='yes, no, or reverse - [default: %(default)s]', action='store', type=str, dest='stranded', metavar='STRANDED', default='yes')
@@ -135,7 +135,7 @@ def kmerParser(subparser):
     return kmer_parser
 
 def parseArgs():
-    revision_date = "Jan_25_2016"
+    revision_date = "Feb152015"
     parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
     parser.add_argument("--version", action="version", version="expHTS Version v" + version_num + "." + revision_date )
     subparsers = parser.add_subparsers(help='commands', dest='command')

@@ -81,62 +81,58 @@ class preprocessCMD:
 
 
                         if SEandPE[0] != "":
-                                terminalString = []
-                                if args.contaminateFolder != "":
-                                        contArgsBaseline = "-c " + args.contaminateFolder + contArgsBaseline
+                            terminalString = []
+                            if args.contaminateFolder != "":
+                                contArgsBaseline = "-c " + args.contaminateFolder + contArgsBaseline
+                            terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null"))
+                            terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log")))
 
+                            if args.skipDup == False:
+                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log")))
 
-                                terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null"))
-                                terminalString.append((bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log"))))
+                            sickleArgs = " -o stdout -t sanger -l " + args.minLength + " -T "
+                            if args.polyTrim:
+                                sickleArgs += " -a "
 
-                                if args.skipDup == False:
-                                    terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log")))
+                            terminalString.append(bashSub("scythe",  [args.adapter], ["-a"], terminalString[-1].processSub()[0] + " -q sanger", os.path.join(meta, "SE_scythe_info.log")))
+                            terminalString.append(bashSub("sickle se", terminalString[-1].processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log")))
 
-                                sickleArgs = " -o stdout -T -t sanger -l " + args.minLength
-                                if args.polyTrim:
-                                        sickleArgs += " -a "
-
-                                terminalString.append(bashSub("scythe",  [args.adapter], ["-a"], terminalString[-1].processSub()[0] + " -q sanger", os.path.join(meta, "SE_scythe_info.log")))
-                                terminalString.append(bashSub("sickle se", terminalString[-1].processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log")))
-                                terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
-
-                                print "___ SE COMMANDS ____"
-                                print terminalString[-1].getCommand()
-                                terminalString[-1].runCmd("")
-                                time += terminalString[-1].returnTime()
+                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
+                            print "___ SE COMMANDS ____"
+                            print terminalString[-1].getCommand()
+                            terminalString[-1].runCmd("")
+                            time += terminalString[-1].returnTime()
                         if SEandPE[1] != "":
-                                terminalString = []
-                                if args.contaminateFolder != "":
-                                        contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
-
-                                terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
-                                terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
+                            terminalString = []
+                            if args.contaminateFolder != "":
+                                if os.path.exists(args.contaminatesFolder):
+                                    contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
+                                    
+                            terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
+                            terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
     
-                                if args.skipDup == False:
-                                    terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
+                            if args.skipDup == False:
+                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
 
+                            sickleArgs = " -m stdout -s /dev/null -t sanger -T "
+                            if args.polyTrim:
+                                sickleArgs += " -a "
 
-                                sickleArgs = " -m stdout -s /dev/null -t sanger -T "
-                                if args.polyTrim:
-                                        sickleArgs += " -a "
+                            terminalString.append(bashSub("sickle pe", terminalString[-1].processSub(), ['-c'], sickleArgs , os.path.join(meta, "PE_sickle_info.log")))
 
-                                terminalString.append(bashSub("sickle pe", terminalString[-1].processSub(), ['-c'], sickleArgs , os.path.join(meta, "PE_sickle_info.log")))
+                            if args.skipFlash == False:
+                                terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
 
-                                #flash = bashSub("flash2", sickle.processSub(), ['--interleaved-input'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[-1] + " -d " + key[1] + " 2>" + os.path.join(meta, "flash_info.log"), os.path.join(meta, "flash_info.log"))
-                                #stats = bashSub("stats", flash.processSub(), [], '', os.path.join(meta, "stats.log"));
-                                if args.skipFlash == False:
-                                    terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
-
-                                terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
+                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
 
 
 
-                                print "___ PE COMMANDS ___"
-                                print terminalString[-1].getCommand()
-                                terminalString[-1].runCmd("")
-                                sys.stderr.flush()
-                                time += terminalString[-1].returnTime()
-                                logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
+                            print "___ PE COMMANDS ___"
+                            print terminalString[-1].getCommand()
+                            terminalString[-1].runCmd("")
+                            sys.stderr.flush()
+                            time += terminalString[-1].returnTime()
+                            logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
 
                 bringTogether(logFiles, os.path.join(args.finalDir, "Preprocessing_Summary.log"))
                 print "Total amount of seconds to run all samples"

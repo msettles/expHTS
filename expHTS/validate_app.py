@@ -144,6 +144,11 @@ class validateApp:
                             self.sampleFiles[sampleSeq] = []
                         
                         self.sampleFiles[sampleSeq].append(self.isPairedEnd(file))
+                    elif "_SE" in file and "fastq" in file:
+                        fastqCount += 1
+                        if not sampleSeq in self.sampleFiles:
+                            self.sampleFiles[sampleSeq] = []
+                        self.sampleFiles[sampleSeq].append(self.isPairedEnd(file))
 
 
             if (fastqCount == 0):
@@ -162,6 +167,8 @@ class validateApp:
 
     #returns 2 elements in list if paired end reads or 1 element in list if it is a SE
     def isPairedEnd(self, fileRead1):
+        if "_SE" in fileRead1:
+            return [fileRead1]
 
         file2 = fileRead1.replace("_R1", "_R2")
         SE = fileRead1.replace("_R1", "_SE")
