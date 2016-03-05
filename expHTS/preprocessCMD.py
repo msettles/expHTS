@@ -82,8 +82,8 @@ class preprocessCMD:
 
                         if SEandPE[0] != "":
                             terminalString = []
-                            if args.contaminateFolder != "":
-                                contArgsBaseline = "-c " + args.contaminateFolder + contArgsBaseline
+                            if args.contaminantsFolder != "":
+                                contArgsBaseline = "-c " + args.contaminantsFolder + contArgsBaseline
                             terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null"))
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log")))
 
@@ -104,9 +104,9 @@ class preprocessCMD:
                             time += terminalString[-1].returnTime()
                         if SEandPE[1] != "":
                             terminalString = []
-                            if args.contaminateFolder != "":
+                            if args.contaminantsFolder != "":
                                 if os.path.exists(args.contaminantsFolder):
-                                    contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
+                                    contArgsBaseline = "-c " + args.contaminantsFolder +  contArgsBaseline
                                     
                             terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
