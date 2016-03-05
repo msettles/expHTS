@@ -90,7 +90,7 @@ def preprocessParser(subparser):
     expHTS_parser.add_argument('-o', '--overlap', help='Overlap parameter for flash [default: %(default)s]', action='store', type=str, dest='overlapFlash', metavar='OVERLAP', default='700')
     expHTS_parser.add_argument('-O', '--skip-overlap', help='do not perform the overlapping using flash [default: %(default)s]', action='store_true', dest='skipFlash',  default=False)
     expHTS_parser.add_argument('-s', '--skip-duplicates', help='do not preform the deduplication step [default: %(default)s]', action='store_true',  dest='skipDup',  default=False)
-    expHTS_parser.add_argument('-c', '--contaminates-folder', help='folder name with contaminate sequences in fasta format [default: %(default)s]', action='store', type=str, default='',  dest='contaminateFolder', metavar='CONTAMNANTS-FOLDER')
+    expHTS_parser.add_argument('-c', '--contaminates-folder', help='folder name with contaminate sequences in fasta format [default: %(default)s]', action='store', type=str, default='',  dest='contaminantsFolder', metavar='CONTAMNANTS-FOLDER')
     expHTS_parser.add_argument('-a', '--polyA', help='perform polyA trimming in sickle [default: %(default)s]', action='store_true', dest='polyTrim', default=False)
     expHTS_parser.add_argument('-F', '--final-folder', help='folder name in which the sequences will go [default: %(default)s', action='store', type=str, default="02-Cleaned", dest="finalDir", metavar='DIRECTORY')
     expHTS_parser.add_argument('-w', '--overwrite', help='overwrite a sequence id folder [default: %(default)s]', action='store_true', dest='force', default=False)

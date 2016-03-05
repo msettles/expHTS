@@ -105,7 +105,7 @@ class preprocessCMD:
                         if SEandPE[1] != "":
                             terminalString = []
                             if args.contaminateFolder != "":
-                                if os.path.exists(args.contaminatesFolder):
+                                if os.path.exists(args.contaminantsFolder):
                                     contArgsBaseline = "-c " + args.contaminateFolder +  contArgsBaseline
                                     
                             terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
