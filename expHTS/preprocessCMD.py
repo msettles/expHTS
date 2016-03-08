@@ -104,6 +104,7 @@ class preprocessCMD:
                             time += terminalString[-1].returnTime()
                         if SEandPE[1] != "":
                             terminalString = []
+
                             if args.contaminantsFolder != "":
                                 if os.path.exists(args.contaminantsFolder):
                                     contArgsBaseline = "-c " + args.contaminantsFolder +  contArgsBaseline
