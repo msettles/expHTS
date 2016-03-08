@@ -83,7 +83,7 @@ def preprocessParser(subparser):
     expHTS_parser = subparser.add_parser('preprocess', help='runs the expHTS preprocessing pipeline')
     expHTS_parser.add_argument('-f', '--samplesfile', help='The filename of the sample file [default: %(default)s]', action='store', type=str, dest='samplesFile', metavar='FILENAME', default='samples.txt')
     expHTS_parser.add_argument('-S', '--forceSplit', help='Forces splits of SE reads [default: %(default)s]', action='store_true', dest='forceSplit', default=False)
-    expHTS_parser.add_argument('-A', '--adapterfasta', help='folder name with adapter sequences in fasta format [default: %(default)s]', action='store', type=str, default=r'<(printf ">TruSeq_forward_contam\nAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC[NNNNNN]ATCTCGTATGCCGTCTTCTGCTTGAAAAA\n>TruSeq_reverse_contam\nAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATTAAAAA")',  dest='adapter', metavar='CONTAMNANTS-FOLDER')
+    expHTS_parser.add_argument('-A', '--adapterfasta', help='folder name with adapter sequences in fasta format [default: %(default)s]', action='store', type=str, default=r'<(printf ">TruSeq_forward_contam\nAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC[NNNNNN]ATCTCGTATGCCGTCTTCTGCTTGAAAAA\n>TruSeq_reverse_contam\nAGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATTAAAAA")',  dest='adapter', metavar='ADAPTER-FILE')
     expHTS_parser.add_argument('-d', '--directory', help='Directory where the raw sequence data is stored [default: %(default)s]', action='store', type=str, dest='samplesDirectory', metavar='DIRECTORY', default='00-RawData')
     expHTS_parser.add_argument('-q', '--quality', help='Quality score to use during lucy trimming [default: %(default)s]', action='store', type=str, dest='qualityTrim', metavar='QUALITY', default='20')
     expHTS_parser.add_argument('-m', '--miniumumLength', help='Discard reads less than minimum length [default: %(default)s]', action='store', type=str, dest='minLength', metavar='MINIUMUMLENGTH', default='50')
@@ -135,7 +135,7 @@ def kmerParser(subparser):
     return kmer_parser
 
 def parseArgs():
-    revision_date = "Feb152015"
+    revision_date = "Feb152016"
     parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
     parser.add_argument("--version", action="version", version="expHTS Version v" + version_num + "." + revision_date )
     subparsers = parser.add_subparsers(help='commands', dest='command')
