@@ -94,8 +94,8 @@ class screening:
 		#concat everything in folder
 		#bowtie2-build
 
-		fastaFile = ".screening_cont.fasta"
-		indexFile = ".screening_cont_index"
+		fastaFile = "screening_cont.fasta"
+		indexFile = "screening_cont_index"
 
 		## added phiX to the file directly so that if no internet access will still work
 		# wget = bashSub("wget", ["-"], ["-O"], '"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&rettype=fasta&retmode=text&id=9626372"', "/dev/null")
