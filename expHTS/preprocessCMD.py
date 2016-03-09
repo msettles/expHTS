@@ -84,7 +84,7 @@ class preprocessCMD:
                             terminalString = []
                             if args.contaminantsFolder != "":
                                 contArgsBaseline = "-c " + args.contaminantsFolder + contArgsBaseline
-                            terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline, "/dev/null"))
+                            terminalString.append(bashSub(screen, [SEandPE[0]], ['-U'], contArgsBaseline , os.path.join(meta, "SE_preproc_mapping.log")))
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log")))
 
                             if args.skipDup == False:
@@ -109,7 +109,7 @@ class preprocessCMD:
                                 if os.path.exists(args.contaminantsFolder):
                                     contArgsBaseline = "-c " + args.contaminantsFolder +  contArgsBaseline
                                     
-                            terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, "/dev/null"))
+                            terminalString.append(bashSub(screen, [SEandPE[1], SEandPE[2]], ['-1', '-2'], contArgsBaseline, os.path.join(meta, "PE_preproc_mapping.log")))
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
     
                             if args.skipDup == False:
