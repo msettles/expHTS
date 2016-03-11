@@ -48,11 +48,8 @@ def returnReads(dictSampleSeqFiles):
 
 
 def check_dir(Dir):
-
         if not os.path.exists(Dir):
                 os.mkdir(Dir)
-
-
 
 class preprocessCMD:
         def __init__(self):

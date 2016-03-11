@@ -320,7 +320,6 @@ def bringTogether(listFiles, out):
     first = 0
     outFile = open(out, "w")
 
-    print listFiles
     for e in listFiles:
         f = open(e, "r")
         lines = f.readlines()
