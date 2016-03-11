@@ -66,8 +66,8 @@ class preprocessCMD:
 
                 for key in dictSampleSeqFiles:
                         check_dir(args.finalDir)
-                        check_dir(key[1])
-                        meta =  key[1]
+                        check_dir(key)
+                        meta =  key
 
                         SEandPE = returnReads(dictSampleSeqFiles[key])
                         #screening python scripts created in virtual enviroment
@@ -94,7 +94,7 @@ class preprocessCMD:
                             terminalString.append(bashSub("scythe",  [args.adapter], ["-a"], terminalString[-1].processSub()[0] + " -q sanger", os.path.join(meta, "SE_scythe_info.log")))
                             terminalString.append(bashSub("sickle se", terminalString[-1].processSub(), ['-f'], sickleArgs, os.path.join(meta, "SE_sickle_info.log")))
 
-                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
+                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key, key.split('/')[1]), ""))
                             print "___ SE COMMANDS ____"
                             print terminalString[-1].getCommand()
                             terminalString[-1].runCmd("")
@@ -119,9 +119,9 @@ class preprocessCMD:
                             terminalString.append(bashSub("sickle pe", terminalString[-1].processSub(), ['-c'], sickleArgs , os.path.join(meta, "PE_sickle_info.log")))
 
                             if args.skipFlash == False:
-                                terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key[1].split('/')[1] + " -d " + key[1] + " -To -c ", os.path.join(meta, "flash_info.log")))
+                                terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key.split('/')[1] + " -d " + key + " -To -c ", os.path.join(meta, "flash_info.log")))
 
-                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key[1], key[1].split('/')[1]), ""))
+                            terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key, key.split('/')[1]), ""))
 
 
 
@@ -130,7 +130,7 @@ class preprocessCMD:
                             terminalString[-1].runCmd("")
                             sys.stderr.flush()
                             time += terminalString[-1].returnTime()
-                            logFiles.append(parseOut(key[1], key[1].split("/")[-1]))
+                            logFiles.append(parseOut(key, key.split("/")[-1]))
 
                 bringTogether(logFiles, os.path.join(args.finalDir, "Preprocessing_Summary.log"))
                 print "Total amount of seconds to run all samples"

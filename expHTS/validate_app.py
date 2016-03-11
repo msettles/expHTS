@@ -129,9 +129,11 @@ class validateApp:
 
 
     def directoryFiles(self, sampleSeq):
-        sampleSeq = tuple(sampleSeq)
-        #print sampleSeq
+        #sampleSeq = sampleSeq[1]
+        
+        print sampleSeq
         directoryTest = sampleSeq[0].rstrip();
+        sampleSeq = sampleSeq[1]
         #fastqCount insures at least one fastq files is under the directory
         fastqCount = 0
         if self.testDirectory(directoryTest):
