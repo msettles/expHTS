@@ -112,14 +112,15 @@ class preprocessCMD:
                             if args.skipDup == False:
                                 terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
 
+                            if args.skipFlash == False:
+                                terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key.split('/')[1] + " -d " + key + " -To -c ", os.path.join(meta, "flash_info.log")))
+
                             sickleArgs = " -m stdout -s /dev/null -t sanger -T "
                             if args.polyTrim:
                                 sickleArgs += " -a "
 
                             terminalString.append(bashSub("sickle pe", terminalString[-1].processSub(), ['-c'], sickleArgs , os.path.join(meta, "PE_sickle_info.log")))
 
-                            if args.skipFlash == False:
-                                terminalString.append(bashSub("flash2", terminalString[-1].processSub(), ['-Ti'], " -M " + args.overlapFlash + " --allow-outies -o " + key.split('/')[1] + " -d " + key + " -To -c ", os.path.join(meta, "flash_info.log")))
 
                             terminalString.append(bashSub(finalClean, terminalString[-1].processSub(), [''],  " " +  str(int(args.polyTrim)) + " " + str(int(args.forceSplit)) + " " + args.minLength + " " + os.path.join(key, key.split('/')[1]), ""))
 
