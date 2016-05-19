@@ -76,7 +76,7 @@ class spadesCMD:
             terminal = []
             
             #countFile = os.path.join(keys[1], keys[0].split("/")[-1]) + ".counts"
-            print len(dictSampleSeqFiles[keys][0])
+            print dictSampleSeqFiles[keys][0]
             if (len(dictSampleSeqFiles[keys][0]) == 3):
                 terminal.append(bashSub("spades.py", dictSampleSeqFiles[keys][0], ['-1', '-2', '-s'], " --careful -t " + args.threads + " -o " + keys[1] + " -m " + args.memory, ''))
             elif (len(dictSampleSeqFiles[keys][0]) == 2):
