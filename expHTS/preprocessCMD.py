@@ -85,7 +85,7 @@ class preprocessCMD:
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "SE_filter_info.log")))
 
                             if args.skipDup == False:
-                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-U'], "-p stdout", os.path.join(meta, "SE_deduper_info.log")))
+                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-U'], "-s 5 -l 15 -p stdout", os.path.join(meta, "SE_deduper_info.log")))
 
                             sickleArgs = " -o stdout -t sanger -l " + args.minLength + " -T "
                             if args.polyTrim:
@@ -110,7 +110,7 @@ class preprocessCMD:
                             terminalString.append(bashSub(extract_unmapped, terminalString[-1].processSub(), [''], " -o stdout" , os.path.join(meta, "PE_filter_info.log")))
     
                             if args.skipDup == False:
-                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-p stdout", os.path.join(meta, "PE_deduper_info.log")))
+                                terminalString.append(bashSub("super_deduper", terminalString[-1].processSub(), ['-i'], "-s 5 -l 15 -p stdout", os.path.join(meta, "PE_deduper_info.log")))
 
                             sickleArgs = " -m stdout -s /dev/null -t sanger -T "
                             if args.polyTrim:
