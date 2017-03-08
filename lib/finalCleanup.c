@@ -517,12 +517,12 @@ int clean(const char *devFile, const char *logFile, const char *strR1, const cha
             R2_len += (s.R2_length[sum] * sum);
             SE_len += (s.SE_length[sum] * sum);
         }
-
+        printf("%f HERE\n", (float)R2_len/(float)(s.pe_kept));
         fprintf(log, "A\tT\tG\tC\tN\tPolyA_Removed_Reads\tPolyT_Removed_Reads\tShort_discarded\tPE_Kept\tSE_Kept\tForced_Pairs\tR1_Ave_Len\tR2_Ave_Len\tSE_Ave_Len\tAverageQual\n");
-        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t\
-                %.2f\t%.2f\t%.2f\t%.2f\n", 
-                s.A, s.T, s.G, s.C, s.N, s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs,
-        (float)R1_len/(float)(s.pe_kept), (float)R2_len/(float)(s.pe_kept), (float)SE_len/(float)(s.se_kept), (float)((float)(s.qualTotal)/(float)(s.A + s.T + s.C + s.G + s.N)));
+        fprintf(log, "%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%llu\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+                s.A, s.T, s.G, s.C, s.N, 
+                s.polyATrimmed, s.polyTTrimmed, s.r1_discarded + s.r2_discarded + s.se_discarded, s.pe_kept, s.se_kept, s.numForcedPairs, 
+                (float)R1_len/(float)(s.pe_kept), (float)R2_len/(float)(s.pe_kept), (float)SE_len/(float)(s.se_kept), (float)s.qualTotal/(float)(s.A + s.T + s.C + s.G + s.N) );
 
           
     if (f != NULL) {

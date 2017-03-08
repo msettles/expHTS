@@ -135,8 +135,8 @@ def kmerParser(subparser):
     return kmer_parser
 
 def parseArgs():
-    revision_date = "Feb152016"
-    parser = argparse.ArgumentParser(description="expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
+    revision_date = "Mar82017"
+    parser = argparse.ArgumentParser(description="(This software is no longer supported and should definitley not be used with SE reads) expHTS: Analysis of high throughput sequencing data in an experiment context ", epilog="For questions or comments, please contact Matt Settles <msettles@uidaho.edu>", add_help=True)
     parser.add_argument("--version", action="version", version="expHTS Version v" + version_num + "." + revision_date )
     subparsers = parser.add_subparsers(help='commands', dest='command')
 

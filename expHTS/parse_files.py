@@ -34,6 +34,31 @@ def flashParser(f, h, d):
     d += data
 
 
+def preprocParser(f, h, d):
+    if not os.path.isfile(f):
+        return
+
+    f = open(f, "r")
+    strSearch = [") were paired; of these:", "aligned concordantly 0 times"]
+    header = ["Total_Cont_Screened", "Passed_Cont_Screen", "Percentage_Passed_Cont_Screen"]
+
+    data = []
+
+    lines = f.readlines()
+    if lines == []:
+        return
+
+    index = 0
+    for e in lines:
+        if strSearch[0] in e:
+            data.append(int(re.search(r'\d+', e).group()))
+        elif strSearch[1] in e:
+            data.append(int(re.search(r'\d+', e).group()))
+            data.append(float(re.findall(r'\d+.\d+', e)[-1]))
+            break;
+    h += header
+    d += data
+
 def sickleParser(f, h, d):
     if not os.path.isfile(f):
         return
@@ -246,12 +271,14 @@ def parseOut(base, sample):
     header.append("Sample")
     data.append(sample)
 
+    
+    preprocParser(os.path.join(base, "PE_preproc_mapping.log"), header, data)
     filterParser(os.path.join(base, "PE_filter_info.log"), header, data)
     deduperParser(os.path.join(base, "PE_deduper_info.log"), header, data)
     sickleParser(os.path.join(base, "PE_sickle_info.log"), header, data)
     flashParser(os.path.join(base, "flash_info.log"), header, data)
     finalParser(os.path.join(base, "finalCleanup.log"), header, data)
-
+    
 
     data = data[:len(data)-2]
     printToFile(os.path.join(base, sample + "_SummaryStats.log"), header, data)
