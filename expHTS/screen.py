@@ -96,8 +96,8 @@ class screening:
         #concat everything in folder
         #bowtie2-build
 
-        fastaFile = "screening_cont." + self.t + ".fasta"
-        indexFile = "screening_cont." + self.t + "_index"
+        fastaFile = "screening_cont." + str(self.t) + ".fasta"
+        indexFile = "screening_cont." + str(self.t) + "_index"
 
         ## added phiX to the file directly so that if no internet access will still work
         # wget = bashSub("wget", ["-"], ["-O"], '"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&rettype=fasta&retmode=text&id=9626372"', "/dev/null")
@@ -146,7 +146,7 @@ class screening:
         cmd = bowtie.runCmd("")
 
     def cleanUp(self):
-        for f in glob.glob("screening_cont." + self.t + "*"):
+        for f in glob.glob("screening_cont." + str(self.t) + "*"):
             os.remove(f)
 
 
