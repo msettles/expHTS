@@ -1,4 +1,5 @@
 from bashSub import bashSub
+from time import time
 import os
 import glob
 import argparse
@@ -85,7 +86,8 @@ phiX = """'>gi|9626372|ref|NC_001422.1| Enterobacteria phage phiX174 sensu lato,
         TGTGACGACAAATCTGCTCAAATTTATGCGCGCTTCGATAAAAATGATTGGCGTATCCAACCTGCA'"""
 
 class screening:
-    def __init__(self):
+    def __init__(self, time_t):
+        self.t = time_t
         pass
 
 
@@ -94,8 +96,8 @@ class screening:
         #concat everything in folder
         #bowtie2-build
 
-        fastaFile = "screening_cont.fasta"
-        indexFile = "screening_cont_index"
+        fastaFile = "screening_cont." + self.t + ".fasta"
+        indexFile = "screening_cont." + self.t + "_index"
 
         ## added phiX to the file directly so that if no internet access will still work
         # wget = bashSub("wget", ["-"], ["-O"], '"http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&rettype=fasta&retmode=text&id=9626372"', "/dev/null")
@@ -144,7 +146,7 @@ class screening:
         cmd = bowtie.runCmd("")
 
     def cleanUp(self):
-        for f in glob.glob(".screening_cont*"):
+        for f in glob.glob("screening_cont." + self.t + "*"):
             os.remove(f)
 
 
@@ -157,8 +159,10 @@ def main():
     parser.add_argument("-c", "--contimantFolder", type=str, action="store", dest="cont", help="location of fasta files you would like to remove", metavar="DIR", default="")
     parser.add_argument("-e", "--stderr", type=str, action="store", dest="stderr", help="stderr output of bowtie2", metavar="stderr FILE", default = "")
 
-    args = parser.parse_args()    
-    screen = screening()
+    args = parser.parse_args()
+
+    t = time()  # unique time tag for this instance of screen indexes
+    screen = screening(t)
 
     if (args.read1 == "" and args.read2 != "") or (args.read1 != "" and args.read2 == ""):
         print "Read 1 and Read 2 both must be specified if one is"
@@ -173,6 +177,7 @@ def main():
         print "Please specifiy reads"
         exit(1)
 
+    screen.cleanUp()
 
 
 main()
